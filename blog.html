@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博客文章</title>
+    <style>
+        /* 全局样式 */
+        body {
+            background-color: #f2f2f2;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-weight: normal;
+        }
+
+        /* 文章内容样式 */
+        .article {
+            max-width: 800px;
+            margin: 50px auto;
+        }
+
+        .article-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .article-title {
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        .article-date {
+            font-size: 18px;
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        .article-content {
+            font-size: 18px;
+            line-height: 1.5;
+            margin-bottom: 30px;
+        }
+
+        .article-image {
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .article-image img {
+            width: 100%;
+            height: auto;
+        }
+
+        .article-quote {
+            font-style: italic;
+            font-size: 24px;
+            margin-bottom: 30px;
+            padding: 10px;
+            border-left: 5px solid #ccc;
+        }
+
+        .article-author {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .article-tags {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .article-tag {
+            display: inline-block;
+            padding: 5px 10px;
+            margin-right: 10px;
+            background-color: #333;
+            color: white;
+            border-radius: 5px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .article-tag:hover {
+            background-color: #555;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            border: none;
+            background-color: #333;
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .back-button:hover {
+            background-color: #003366;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .back-button:hover:before {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="article">
+        <h1 class="article-header">
+            <span class="article-title">文章标题</span>
+            <br>
+            <span class="article-date">发布时间：2021年10月1日</span>
+        </h1>
+        <div class="article-content">
+            <p>这里是文章的开头，可以简要介绍一下文章的主题和重点内容。</p>
+            <p>接下来是正文内容，可以根据需要添加段落、图片、引用等元素，以表达您的思想和观点。</p>
+            <div class="article-image">
+                <img src="https://picsum.photos/800/400?random=8" alt="Article Image">
+            </div>
+            <p>这里是一个引用：</p>
+            <blockquote class="article-quote">
+                引用内容
+            </blockquote>
+            <p>这里是一段结论：</p>
+            <p>总之，这篇文章希望能够给读者带来启发和思考，欢迎留言和讨论。</p>
+            <p class="article-author">作者：您的名字</p>
+            <p class="article-tags">
+                标签：
+                <a href="#" class="article-tag">标签1</a>
+                <a href="#" class="article-tag">标签2</a>
+                <a href="#" class="article-tag">标签3</a>
+            </p>
+
+        </div>
+
+        <a href="./index.html" class="back-button">返回主页</a>
+        <!-- <a href="./index.html" id="backButton">返回主页</a> -->
+    </div>
+
+</body>
+
+</html>

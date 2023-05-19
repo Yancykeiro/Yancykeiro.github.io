@@ -1,257 +1,531 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+    <meta charset="UTF-8">
+    <title>个人主页</title>
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
 
-  <link rel="stylesheet" type="text/css" href="./index.css" />
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-weight: normal;
+        }
+
+        /* 导航栏样式 */
+        .navbar {
+            background-color: #333;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .navbar-nav {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-item {
+            margin-right: 20px;
+        }
+
+        .nav-link {
+            font-size: 18px;
+            padding: 10px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+
+        /* 轮播图样式 */
+        .slideshow-container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .mySlides {
+            display: none;
+            text-align: center;
+        }
+
+        .mySlides img {
+            width: 100%;
+            height: auto;
+        }
+
+        .prev,
+        .next {
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            width: auto;
+            padding: 16px;
+            margin-top: -22px;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            transition: 0.6s ease;
+            border-radius: 0 3px 3px 0;
+            user-select: none;
+        }
+
+        .next {
+            right: 0;
+            border-radius: 3px 0 0 3px;
+        }
+
+        .prev:hover,
+        .next:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        /* 个人信息样式 */
+        .profile-section {
+            max-width: 800px;
+            margin: 50px auto;
+            text-align: center;
+        }
+
+        .profile-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        .profile-image img {
+            width: 100%;
+            height: auto;
+        }
+
+        .profile-name {
+            font-size: 36px;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .profile-job-title {
+            font-size: 24px;
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        .profile-bio {
+            font-size: 18px;
+            line-height: 1.5;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 博客文章样式 */
+        .blog-posts-section {
+            max-width: 800px;
+            margin: 50px auto;
+        }
+
+        .blog-posts-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .blog-post {
+            margin-bottom: 30px;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .blog-post-image {
+            width: 100%;
+            height: 250px;
+            overflow: hidden;
+        }
+
+        .blog-post-image img {
+            width: 100%;
+            height: auto;
+        }
+
+        .blog-post-content {
+            padding: 20px;
+        }
+
+        .blog-post-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .blog-post-date {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .blog-post-excerpt {
+            font-size: 18px;
+            line-height: 1.5;
+        }
+
+        /* Demo展示样式 */
+        .demos-section {
+            max-width: 800px;
+            margin: 50px auto;
+        }
+
+        .demo {
+            margin-bottom: 30px;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .demo-image {
+            width: 100%;
+            height: 250px;
+            overflow: hidden;
+        }
+
+        .demo-image img {
+            width: 100%;
+            height: auto;
+        }
+
+        .demo-content {
+            padding: 20px;
+        }
+
+        .demo-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .demo-description {
+            font-size: 18px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .demo-link {
+            display: inline-block;
+            font-size: 18px;
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border-radius: 5px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .demo-link:hover {
+            background-color: #555;
+        }
+
+        /* 联系方式样式 */
+        .contact-section {
+            max-width: 800px;
+            margin: 50px auto;
+            text-align: center;
+        }
+
+        .contact-link {
+            display: inline-block;
+            font-size: 18px;
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border-radius: 5px;
+            transition: all 0.2s ease-in-out;
+            margin-right: 20px;
+        }
+
+        .contact-link:last-child {
+            margin-right: 0;
+        }
+
+        .contact-link:hover {
+            background-color: #555;
+        }
+
+        .tech-tag {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 5px;
+            background-color: #f5f5f5;
+            color: #333;
+            border-radius: 20px;
+        }
+
+        .tech-tag:hover {
+            background-color: #333;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .contact-info {
+            /* max-width: 300px; */
+            margin: 30px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        .contact-info h2 {
+            margin-top: 0;
+            font-size: 24px;
+            color: #fff;
+            text-transform: uppercase;
+            background-color: #333;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .contact-info:before {
+            content: "";
+            display: block;
+            height: 100%;
+            width: 100%;
+            background-color: #f8f8f8;
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            z-index: -1;
+        }
+
+        .contact-info p {
+            margin: 20px 0;
+            font-size: 16px;
+            line-height: 1.4;
+            color: #333;
+            background-color: #f8f8f8;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .contact-info ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .contact-info li {
+            margin: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .contact-info a {
+            display: block;
+            width: 60px;
+            height: 60px;
+            background-color: #333;
+            color: #fff;
+            font-size: 24px;
+            line-height: 60px;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .contact-info a:hover {
+            background-color: #555;
+            color: #fff;
+        }
+    </style>
 </head>
 
 <body>
-  <button onclick="location.href = './panorama.html'">进入页面二</button>
-  <!-- <section style="
-          background: linear-gradient(
-            rgba(6, 2, 45, 255) 0.05%,
-            rgba(14, 8, 29, 255) 99.95%
-          );z-index: 1;
-        " class="overflow-hidden py-128 resource position-relative">
-    <div class=" text-center ">
-      <h3 class="title text-white">内置丰富社区资源<span class="d-sm-inline-block d-none">，</span><br
-          class="d-sm-none d-block">设计无需从0开始</h3>
-      <nav class="resource-tab position-relative">
-        <input type="radio" name="resource-tab--item" id="tab1" checked />
-        <label class="tab-title" for="tab1" data-tab="移动应用">
-          <svg class="tab-icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            xmlns="http://www.w3.org/2000/svg">
-            <rect x="5" y="3" width="14" height="18" rx="1" stroke="currentColor" stroke-width="2" />
-            <circle cx="12" cy="18" r="1" fill="currentColor" />
-          </svg>
-          <span class="tab-text">移动应用</span>
-        </label>
+    <nav class="navbar">
+        <a href="#" class="navbar-brand">个人主页</a>
+        <ul class="navbar-nav">
+            <li class="nav-item"><a href="#profile-section" class="nav-link">个人信息</a></li>
+            <li class="nav-item"><a href="#blog-posts-section" class="nav-link">博客文章</a></li>
+            <li class="nav-item"><a href="#demos-section" class="nav-link">Demo展示</a></li>
+            <li class="nav-item"><a href="#contact-section" class="nav-link">联系方式</a></li>
+        </ul>
+    </nav>
 
-        <input type="radio" name="resource-tab--item" id="tab2" />
-        <label class="tab-title" for="tab2" data-tab="网站创意">
-          <svg class="tab-icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" clip-rule="evenodd"
-              d="M4 5H20V9H4V5ZM4 11V19H20V11H4ZM2 5C2 3.89543 2.89543 3 4 3H20C21.1046 3 22 3.89543 22 5V19C22 20.1046 21.1046 21 20 21H4C2.89543 21 2 20.1046 2 19V5ZM6 8C6.55228 8 7 7.55228 7 7C7 6.44772 6.55228 6 6 6C5.44772 6 5 6.44772 5 7C5 7.55228 5.44772 8 6 8ZM11 7C11 7.55228 10.5523 8 10 8C9.44772 8 9 7.55228 9 7C9 6.44772 9.44772 6 10 6C10.5523 6 11 6.44772 11 7Z"
-              fill="currentColor" />
-          </svg>
-          <span class="tab-text">网站创意</span>
-        </label>
+    <div class="slideshow-container">
+        <div class="mySlides fade">
+            <img src="https://picsum.photos/800/300?random=1" alt="slide1">
+        </div>
+        <div class="mySlides fade">
+            <img src="https://picsum.photos/800/301?random=2" alt="slide2">
+        </div>
+        <div class="mySlides fade">
+            <img src="https://picsum.photos/800/302?random=3" alt="slide3">
+        </div>
 
-        <input type="radio" name="resource-tab--item" id="tab3" />
-        <label class="tab-title" for="tab3" data-tab="设计系统">
-          <svg class="tab-icon" width="24.000000" height="24.000000" viewBox="0 0 24 24" fill="none"
-            xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-            <g clip-path="url(#clip3_1437)">
-              <path
-                d="M20.7112 7.31767C20.833 7.39647 20.833 7.5748 20.7112 7.65359L12.7026 12.8308C12.5708 12.9163 12.4009 12.9163 12.2686 12.8308L4.25977 7.65358C4.1377 7.57478 4.1377 7.39647 4.25928 7.31766L12.2671 2.14043C12.3994 2.05498 12.5693 2.05496 12.7017 2.1404L20.7112 7.31767Z"
-                stroke="currentColor" stroke-width="2.000000" />
-              <path
-                d="M21.8108 11.9427C21.5068 11.4724 20.8984 11.3418 20.428 11.6458L20.428 11.6458L12.4858 16.7805L4.54248 11.6458L3.99951 12.4856L4.54248 11.6458C4.07227 11.3418 3.46387 11.4725 3.15967 11.9428C2.85596 12.4131 2.98633 13.0214 3.45703 13.3254L11.7256 18.6707Q12.4858 19.162 13.2458 18.6706L21.5139 13.3254L20.9709 12.4856L21.5139 13.3254C21.9841 13.0214 22.1147 12.413 21.8108 11.9427Z"
-                fill-rule="evenodd" fill="currentColor" />
-              <path
-                d="M21.3254 16.9427C21.0215 16.4724 20.4131 16.3418 19.9426 16.6458L19.9426 16.6458L12.0005 21.7805L4.05713 16.6458L3.51416 17.4856L4.05713 16.6458C3.58691 16.3418 2.97852 16.4725 2.67432 16.9428C2.37061 17.4131 2.50098 18.0214 2.97168 18.3254L11.2402 23.6707Q12.0005 24.162 12.7603 23.6706L21.0286 18.3254L20.4856 17.4856L21.0286 18.3254C21.4988 18.0214 21.6294 17.413 21.3254 16.9427Z"
-                fill-rule="evenodd" fill="currentColor" />
-            </g>
-            <defs>
-              <clipPath id="clip3_1437">
-                <rect width="24.000000" height="24.000000" fill="currentColor" />
-              </clipPath>
-            </defs>
-          </svg>
-          <span class="tab-text">设计系统</span>
-        </label>
-
-        <input type="radio" name="resource-tab--item" id="tab4" />
-        <label class="tab-title" for="tab4" data-tab="图标">
-          <svg class="tab-icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            xmlns="http://www.w3.org/2000/svg">
-            <rect x="5" y="3" width="14" height="14" rx="7" stroke="currentColor" stroke-width="2" />
-            <path
-              d="M8 16V20.4835C8 21.2014 8.73405 21.6854 9.39392 21.4026L12 20.2857L14.6061 21.4026C15.2659 21.6854 16 21.2014 16 20.4835V16"
-              stroke="currentColor" stroke-width="2" />
-          </svg>
-          <span class="tab-text">图标</span>
-        </label>
-
-        <input type="radio" name="resource-tab--item" id="tab5" />
-        <label class="tab-title" for="tab5" data-tab="绘图绘表">
-          <!-- <svg class="tab-icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <rect x="5" y="3" width="14" height="14" rx="7" stroke="currentColor" stroke-width="2" />
-                            <path
-                                d="M8 16V20.4835C8 21.2014 8.73405 21.6854 9.39392 21.4026L12 20.2857L14.6061 21.4026C15.2659 21.6854 16 21.2014 16 20.4835V16"
-                                stroke="currentColor" stroke-width="2" />
-                        </svg> -->
-
-  <!-- <svg class="tab-icon" width="24.000000" height="24.000000" viewBox="0 0 24 24" fill="none"
-    xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <g id="属性 1=默认">
-      <g clip-path="url(#clip3_576)">
-        <g id="path" />
-        <g id="合并">
-          <path
-            d="M22 5C22 3.89545 21.1046 3 20 3L4 3C2.89539 3 2 3.89545 2 5L2 19C2 20.1046 2.89539 21 4 21L20 21C21.1046 21 22 20.1046 22 19L22 5M4 19L20 19L20 5L4 5L4 19M12.5 8L11.5 8C11.2239 8 11 8.22388 11 8.5L11 15.5C11 15.7761 11.2239 16 11.5 16L12.5 16C12.7761 16 13 15.7761 13 15.5L13 8.5C13 8.22388 12.7761 8 12.5 8L12.5 8M15.5 10L16.5 10C16.7761 10 17 10.2239 17 10.5L17 15.5C17 15.7761 16.7761 16 16.5 16L15.5 16C15.2239 16 15 15.7761 15 15.5L15 10.5C15 10.2239 15.2239 10 15.5 10L15.5 10M8.5 12L7.5 12C7.22388 12 7 12.2239 7 12.5L7 15.5C7 15.7761 7.22388 16 7.5 16L8.5 16C8.77612 16 9 15.7761 9 15.5L9 12.5C9 12.2239 8.77612 12 8.5 12L8.5 12Z"
-            clip-rule="evenodd" fill-rule="evenodd" fill="currentColor" fill-opacity="0.700000" />
-        </g>
-      </g>
-    </g>
-    <defs>
-      <clipPath id="clip3_576">
-        <rect width="24.000000" height="24.000000" fill="white" />
-      </clipPath>
-    </defs>
-  </svg>
-
-  <span class="tab-text">绘图绘表</span>
-  </label>
-
-  <div class="active-tab"></div>
-  </nav>
-
-  <div class="resource-box">
-    <div class="resource-row d-flex to-right">
-      <a href="https://pixso.cn/community/file/3uAktpqcW95b1rJrEPhDCg?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-1.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
-      <a href="https://pixso.cn/community/file/_J1-dYVqIt_q-YDdHSxc0w?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-2.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
-      <a href="https://pixso.cn/community/file/lEP0rKOZV2g2RNEBLtzi0A?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-3.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
-      <a href="https://pixso.cn/community/file/BAJIKrpKgR6Gdpg-_h7oiA?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-4.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
-      <a href="https://pixso.cn/community/file/X7rMrrC1-S3JSzhf6h9HKg?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-5.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
-      <a href="https://pixso.cn/community/file/aLQjWGfjwkUh-X_qT8vEZw?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-6.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
-      <a href="https://pixso.cn/community/file/-SETgzCq6rAOQk_p121NAw?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-7.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
-      <a href="https://pixso.cn/community/file/3uAktpqcW95b1rJrEPhDCg?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-1.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
-      <a href="https://pixso.cn/community/file/_J1-dYVqIt_q-YDdHSxc0w?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-2.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
-      <a href="https://pixso.cn/community/file/lEP0rKOZV2g2RNEBLtzi0A?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-3.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
-      <a href="https://pixso.cn/community/file/BAJIKrpKgR6Gdpg-_h7oiA?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-4.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
-      <a href="https://pixso.cn/community/file/X7rMrrC1-S3JSzhf6h9HKg?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-5.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
-      <a href="https://pixso.cn/community/file/aLQjWGfjwkUh-X_qT8vEZw?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-6.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
-      <a href="https://pixso.cn/community/file/-SETgzCq6rAOQk_p121NAw?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-7.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
+        <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+        <a class="next" onclick="plusSlides(1)">&#10095;</a>
     </div>
-    <div class="resource-row d-flex to-left  mt-4">
-      <a href="https://pixso.cn/community/file/sIzzogZzt_BkZZu95_7x1w?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-8.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
-      <a href="https://pixso.cn/community/file/GxJQ-Dxn-hG2O3btFgeCjA?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-9.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
-      <a href="https://pixso.cn/community/file/POV6K2WaJPeAD4GO-GVEQw?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-10.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
-      <a href="https://pixso.cn/community/file/Mc57ag4BmUMOU1Oflbbdmw?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-11.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
-      <a href="https://pixso.cn/community/file/0Ch31_pEEj3IX9360j0cNw?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-12.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
-      <a href="https://pixso.cn/community/file/fHodVzgyVj6sEB7pLyGg2w?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-13.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
-      <a href="https://pixso.cn/community/file/sIzzogZzt_BkZZu95_7x1w?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-8.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
-      <a href="https://pixso.cn/community/file/GxJQ-Dxn-hG2O3btFgeCjA?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-9.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
-      <a href="https://pixso.cn/community/file/POV6K2WaJPeAD4GO-GVEQw?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-10.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
-      <a href="https://pixso.cn/community/file/Mc57ag4BmUMOU1Oflbbdmw?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-11.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
-      <a href="https://pixso.cn/community/file/0Ch31_pEEj3IX9360j0cNw?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-12.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
-      <a href="https://pixso.cn/community/file/fHodVzgyVj6sEB7pLyGg2w?from_homeweb=1" target="_blank"
-        class="resource-item">
-        <img src="https://cms.pixso.cn/images/homepage2/pix-app-13.png" class="resource-item--img" loading="lazy"
-          alt="Pixso丰富社区资源">
-      </a>
+
+    <div id="profile-section" class="profile-section">
+        <div class="profile-image">
+            <img src="https://picsum.photos/200" alt="Profile Image">
+        </div>
+        <h2 class="profile-name">您的名字</h2>
+        <div class="profile-job-title">您的职位或头衔</div>
+        <div class="profile-bio">
+            这里填写您的个人介绍，可以是一段简短的自我介绍，也可以是描述您的技能和经验的内容。
+        </div>
+        <div>
+            <span class="tech-tag">HTML</span>
+            <span class="tech-tag">CSS</span>
+            <span class="tech-tag">JavaScript</span>
+            <span class="tech-tag">React</span>
+            <span class="tech-tag">Vue.js</span>
+            <span class="tech-tag">Angular</span>
+            <span class="tech-tag">Node.js</span>
+        </div>
     </div>
-  </div>
-  </div>
-  </section> -->
+
+    <div id="blog-posts-section" class="blog-posts-section" onclick="window.location.href='./blog.html';">
+        <h2 class="blog-posts-header">最新博客文章</h2>
+        <div class="blog-post">
+            <div class="blog-post-image">
+                <img src="https://picsum.photos/800/400?random=4" alt="Blog Post Image">
+            </div>
+            <div class="blog-post-content">
+                <h3 class="blog-post-title"><a href="#">文章标题1</a></h3>
+                <div class="blog-post-date">发布时间：2021年10月1日</div>
+                <div class="blog-post-excerpt">
+                    这里是文章内容的摘要，可以简要概括一下主要内容和观点。
+                </div>
+            </div>
+        </div>
+        <div class="blog-post">
+            <div class="blog-post-image">
+                <img src="https://picsum.photos/800/400?random=5" alt="Blog Post Image">
+            </div>
+            <div class="blog-post-content">
+                <h3 class="blog-post-title"><a href="#">文章标题2</a></h3>
+                <div class="blog-post-date">发布时间：2021年9月15日</div>
+                <div class="blog-post-excerpt">
+                    这里是文章内容的摘要，可以简要概括一下主要内容和观点。
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="demos-section" class="demos-section">
+        <h2>项目Demo展示</h2>
+        <div class="demo">
+            <div class="demo-image">
+                <img src="https://picsum.photos/800/400?random=6" alt="Demo Image">
+            </div>
+            <div class="demo-content">
+                <h3 class="demo-title">Demo标题1</h3>
+                <div class="demo-description">
+                    这里是Demo的描述，可以简要概括一下主要功能和用途。
+                </div>
+                <a href="#" class="demo-link">查看详情</a>
+            </div>
+        </div>
+        <div class="demo">
+            <div class="demo-image">
+                <img src="https://picsum.photos/800/400?random=7" alt="Demo Image">
+            </div>
+            <div class="demo-content">
+                <h3 class="demo-title">Demo标题2</h3>
+                <div class="demo-description">
+                    这里是Demo的描述，可以简要概括一下主要功能和用途。
+                </div>
+                <a href="#" class="demo-link">查看详情</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- <div id="contact-section" class="contact-section">
+        <h2>联系方式</h2>
+        <div>
+            <a href="#" class="contact-link">邮箱</a>
+            <a href="#" class="contact-link">电话</a>
+            <a href="#" class="contact-link">微信</a>
+        </div>
+    </div> -->
+
+
+    <div class="contact-info">
+        <h2>联系我们</h2>
+        <p>如果您有任何问题或疑问，请随时与我们联系。</p>
+        <ul>
+            <li><a href="tel:1234567890"><i class="fa fa-phone"></i></a></li>
+            <li><a href="mailto:info@example.com"><i class="fa fa-envelope"></i></a></li>
+            <li><a href="#"><i class="fa fa-twitter"></i></a></li>
+            <li><a href="#"><i class="fa fa-facebook"></i></a></li>
+            <!-- Add more social media links as needed -->
+        </ul>
+    </div>
+
+
 </body>
+
+<script>
+    var slideIndex = 0;
+    showSlides();
+
+    function showSlides() {
+        var i;
+        var slides = document.getElementsByClassName("mySlides");
+        for (i = 0; i < slides.length; i++) {
+            slides[i].style.display = "none";
+        }
+        slideIndex++;
+        if (slideIndex > slides.length) { slideIndex = 1 }
+        slides[slideIndex - 1].style.display = "block";
+        setTimeout(showSlides, 5000); // 切换时间间隔为5秒
+    }
+
+    function plusSlides(n) {
+        showSlides(slideIndex += n);
+    }
+</script>
 
 </html>
