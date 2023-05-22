@@ -1,0 +1,779 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>光照投影等参数调节</title>
+</head>
+<link rel="stylesheet" type="text/css" href="./index.css" />
+<link rel="stylesheet" type="text/css" href="./main.css" />
+<script src="https://unpkg.com/three@0.132.1/build/three.js"></script>
+<style>
+    #tray {
+        position: absolute;
+        top: 200px;
+        width: 80px;
+        height: auto;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+    }
+
+    .tray_swatch {
+        width: 80px;
+        height: 80px;
+        background-size: 100% 100%;
+    }
+</style>
+
+<body>
+    <div id="container"></div>
+    <div id="tray"></div>
+</body>
+
+<script type="module">
+
+    import { Viewer, Model, CombineMesh, CombineEdge, TzMaterial, TzGLTFLoader } from './tzlib_composerRender.js';
+
+
+    const viewer = (window.viewer = new Viewer({
+        container: 'container',
+        debug: true,
+        grid: true,
+        requestRenderMode: false, //自动渲染
+        texturePath: 'images/',
+        shadowLowerOffset: 0
+    }));
+    viewer.preRender = function (delta) {
+        viewer.primitives.children.filter(i => i.isCombineMesh).forEach(c => c.update(delta));
+    }
+
+
+    viewer.disableHover();
+    load()
+
+
+    async function load(isOldFormat = false) {
+        const files = [
+            'forest_house.glb',
+        ]
+
+        const list = files.map(value => `models/${value}`)
+
+
+        // const list = files.map(value => `https://yancykeiro.github.io/models/${value}`)
+
+        // const list = await getFileList(groupId, domains);
+        // // 加载线框
+        // const edgeFiles = list.map(value => value.slice(0, value.lastIndexOf(".")).concat('_edge.glb'));
+        // // const edgeFiles = list.map(value => value.slice(0, value.lastIndexOf(".")).concat('_edges.glb'));
+        // const gltfs = await Promise.all(edgeFiles.map(edge =>
+        //     Model.rawFromGltf({
+        //         url: edge,
+        //     })));
+
+        // const edge = new CombineEdge().fromObjects(gltfs.map(gltf => gltf.scene));
+        // CombineMesh.edgeObject = edge;
+        // viewer.scene.add(edge);
+
+        // const loader1 = new TzGLTFLoader();
+        // list.forEach(url => {
+        //     loader1.load(url, gltf => {
+        //         console.log("yy", gltf.scene)
+        //         viewer.scene.add(gltf.scene)
+
+        //     })
+        // })
+
+
+        const dracoLoader = new THREE.DRACOLoader();
+        dracoLoader.setDecoderPath('lib/draco/gltf/');
+
+        const loader = new THREE.GLTFLoader();
+        loader.setDRACOLoader(dracoLoader);
+
+
+        const defaultHpr = {
+            heading: 135,
+            pitch: Math.PI * 2 / 5,
+        };
+        loader.load('./models/forest_house.glb', function (gltf) {
+
+            viewer.primitives.add(...gltf.scene.children);
+            viewer.primitives.getBoundingBox(new THREE.Box3()).getCenter(viewer.boundingBoxCenter);
+            // viewer.flyHome();
+            viewer.primitives.children.forEach((c) => {
+                c.receiveShadow = true;
+                c.castShadow = true;
+
+            });
+
+            const heading = viewer.mainControl.azimuthAngle - ((viewer.mainControl.azimuthAngle % (Math.PI * 2)) - Math.PI);
+
+            const polar = viewer.mainControl.polarAngle - (viewer.mainControl.polarAngle % Math.PI);
+
+            viewer.mainControl.fitToSphere(viewer.primitives.getBoundingSphere(new THREE.Sphere()), true, {
+                heading: heading + defaultHpr.heading,
+                pitch: polar + defaultHpr.pitch,
+            });
+
+            // const combineMeshes = CombineMesh.fromMeshes(gltf.scene.children);
+            // if (combineMeshes.length) {
+            //     viewer.primitives.add(...combineMeshes);
+            //     Promise.all(combineMeshes.map(mesh => mesh.readyPromise)).then((combineMeshes) => {
+            //         viewer.loadedEvent.raiseEvent(combineMeshes.flat());
+            //         viewer.primitives.getBoundingBox(new THREE.Box3()).getCenter(viewer.boundingBoxCenter);
+            //         viewer.flyHome();
+            //         combineMeshes.forEach(c => {
+            //             c.receiveShadow = true;
+            //             c.castShadow = true;
+            //             c.rotateY(135);
+            //             viewer.updateShadow();
+            //         })
+            //     })
+            // }
+
+        });
+
+        // console.time("load")
+        // return viewer.loadCombineModel(list).then(() => {
+        //     console.timeEnd("load")
+        //     viewer.flyHome();
+        //     viewer.enableShadow = true;
+        //     viewer.primitives.children.forEach((c) => {
+        //         c.receiveShadow = true;
+        //         c.castShadow = true;
+        //     });
+        //     viewer.updateShadow();
+        //     shadowFar.setValue(100);
+        //     // 自定义纹理切换面板
+        //     initSwatch();
+
+        // });
+    }
+    let renderTarget, renderTargetBlur, blurPlane, horizontalBlurMaterial, verticalBlurMaterial, shadowCamera;
+
+    // viewer.selectedEntityChanged.addEventListener(async function (lastArray, currArray) {
+    //     console.log(currArray, lastArray)
+    //     for (const l of lastArray) {
+    //         l.resetColor();
+    //         // l.resetOutline();
+    //     }
+
+    //     for (const curr of currArray) {
+    //         curr.setColor(0x7db8f0);
+    //         // curr.setOutline(0x7db8f0)
+    //     }
+    // }, viewer);
+
+    // render
+    const renderPass = new THREE.RenderPass(viewer.scene, viewer.camera);
+    viewer.addPass(renderPass);
+
+    // // #region  SSAO
+    // //    SSAO加强边缘效果 两种宽高锯齿不一样
+    // const width = viewer.container.offsetWidth;
+    // const height = viewer.container.offsetHeight;
+    // const ssaoPass = new THREE.SSAOPass(viewer.scene, viewer.camera, width, height);
+    // ssaoPass.kernelRadius = 189;
+    // viewer.addPass(ssaoPass);
+
+    // ssaoPass.reset = () => {
+    //     kernelRadius.setValue(189);
+    //     minDistance.setValue(0.005);
+    //     maxDistance.setValue(0.1);
+    // }
+
+    // // Init gui
+    // const gui = viewer.gui.addFolder('SSAO');
+
+    // gui.add(ssaoPass, 'output', {
+    //     'Default': THREE.SSAOPass.OUTPUT.Default,
+    //     'SSAO Only': THREE.SSAOPass.OUTPUT.SSAO,
+    //     'SSAO Only + Blur': THREE.SSAOPass.OUTPUT.Blur,
+    //     'Beauty': THREE.SSAOPass.OUTPUT.Beauty,
+    //     'Depth': THREE.SSAOPass.OUTPUT.Depth,
+    //     'Normal': THREE.SSAOPass.OUTPUT.Normal
+    // }).onChange(function (value) {
+    //     ssaoPass.output = parseInt(value);
+    // });
+    // var kernelRadius = gui.add(ssaoPass, 'kernelRadius').min(-100).max(500);
+    // var minDistance = gui.add(ssaoPass, 'minDistance').min(0.001).max(1);
+    // var maxDistance = gui.add(ssaoPass, 'maxDistance').min(0.01).max(1);
+    // gui.add(ssaoPass, 'reset')
+    // // #endregion
+
+    // 线框
+    // const defaultParams = {
+    //     edgeVisible: true,
+    //     edgeColor: 0x3c3c3c,
+    //     mterialRenderIsOpen: true,
+    //     deltaHue: 0,
+    //     deltaSaturation: 0,
+    //     deltaLight: 0,
+    // }
+    // viewer.gui.add(defaultParams, "edgeVisible").name('线框开关').onChange((v) => {
+    //     if (v) {
+    //         viewer.scene.add(CombineMesh.edgeObject)
+    //     } else {
+    //         viewer.scene.remove(CombineMesh.edgeObject)
+    //     }
+    // });
+    // viewer.gui.addColor(defaultParams, 'edgeColor').name('整体线框颜色').onChange(function (val) {
+    //     CombineMesh.edgeObject.material.color.setHex(val);
+    // });
+
+    // // 材质渲染 
+    // viewer.gui.add(defaultParams, "mterialRenderIsOpen").name('材质渲染开关').onChange((v) => {
+    //     viewer.primitives.setTextureEnable(v);
+    // });
+    // // 在原有基础上增减v
+    // viewer.gui.add(defaultParams, "deltaHue", -1, 1, 0.1).name('材质色调').onChange((v) => {
+    //     TzMaterial.uniforms['deltaHue'].value = v;
+    // });
+    // viewer.gui.add(defaultParams, "deltaSaturation", -1, 1, 0.1).name('材质饱和度').onChange((v) => {
+    //     TzMaterial.uniforms['deltaSaturation'].value = v;
+    // });
+    // viewer.gui.add(defaultParams, "deltaLight", -1, 1, 0.1).name('材质亮度').onChange((v) => {
+    //     TzMaterial.uniforms['deltaLight'].value = v;
+    // });
+
+
+    // 超级采样抗锯齿 画质好，性能差
+    const ssaaRenderPass = new THREE.SSAARenderPass(viewer.scene, viewer.camera, 0xAAAAAA, 0);
+    ssaaRenderPass.renderToScreen = false;
+    viewer.addPass(ssaaRenderPass);
+
+
+    // 抗锯齿 消耗低
+    // const pixelRatio = viewer.renderer.getPixelRatio();
+    // const fxaaPass = new THREE.ShaderPass(THREE.FXAAShader);
+    // fxaaPass.material.uniforms['resolution'].value.x = 1 / (width * pixelRatio);
+    // fxaaPass.material.uniforms['resolution'].value.y = 1 / (height * pixelRatio);
+    // viewer.addPass(fxaaPass);
+
+
+    // light
+    const ambientLight = viewer.lights.find((l) => l.name === 'ambient_light');
+    ambientLight.intensity = 10
+    const directLight = viewer.lights.find((l) => l.name === 'main_light');
+    directLight.intensity = 1;
+    // viewer.camera.add(directLight)
+
+    // 投影
+    viewer.enableShadow = true;
+    const shadowParams = {
+        switch: true,
+        color: 0xa0a0a0,
+        far: 0,
+        blur: 9,
+        darkness: 1,
+        opacity: 1,
+    }
+
+
+
+
+    const shadowGui = viewer.gui.addFolder('阴影调节');
+    shadowGui.add(shadowParams, "switch").name('阴影开关').onChange((v) => {
+        viewer.enableShadow = v;
+    });
+    shadowGui.addColor(shadowParams, 'color').name('阴影颜色').onChange(function (val) {
+        viewer.scene.children[5].material.color.setHex(val);
+    });
+    const shadowFar = shadowGui.add(shadowParams, 'far', 0, 30).name('阴影显示高度').onChange(function (val) {
+        directLight.shadow.camera.far = val;
+        directLight.shadow.camera.updateProjectionMatrix();
+    });
+    shadowGui.add(shadowParams, 'opacity', 0, 1, 0.1).name('阴影透明度').onChange(function (val) {
+        viewer.scene.children[5].material.opacity = val;
+    });
+    const shadowBlur = shadowGui.add(shadowParams, 'blur', 3, 12, 1).name('阴影虚化度')
+    viewer.postRender = function (delta) {
+        shadowBlur.onChange(function (val) {
+            directLight.shadow.mapSize.width = Math.pow(2, val);
+            directLight.shadow.mapSize.height = Math.pow(2, val);
+            directLight.shadow.map.setSize(Math.pow(2, val), Math.pow(2, val));
+        });
+    }
+
+
+    // 半球光  此灯不能用于投射阴影 设置明暗颜色可以达到类似ssao的效果
+    const hemiLight = new THREE.HemisphereLight(0xd0d0d0, 0x000000);
+    hemiLight.intensity = 0.2;
+    // hemiLight.position.copy(viewer.sun);
+    // 跟着摄像机动
+    // viewer.mainControl.addEventListener('control', () => {
+    //     if (hemiLight.visible) {
+    //         hemiLight.position.copy(viewer.camera.position);
+    //     }
+    // })
+
+    const hemiLightHelper = new THREE.HemisphereLightHelper(hemiLight, 10);
+
+    // 聚光灯
+    const spotLight = new THREE.SpotLight(0xffffff);
+    spotLight.visible = false;
+    spotLight.castShadow = true;
+    viewer.scene.add(spotLight);
+
+    const spotLightHelper = new THREE.SpotLightHelper(spotLight, 0xfff000);
+
+    // 点光源
+    const pointLight = new THREE.PointLight(0xff0000, 1, 100, 2);
+    pointLight.position.set(5, 5, 5);
+    viewer.scene.add(pointLight);
+    pointLight.visible = false;
+
+    const sphereSize = 1;
+    const pointLightHelper = new THREE.PointLightHelper(pointLight, sphereSize);
+
+    // RectAreaLight
+
+
+    // gui
+    const lightGui = viewer.gui.addFolder('光照调节');
+    // const lightGui = viewer.gui.addFolder('Light');
+
+    const lightParams = {
+        ambientLight: true,
+        ambientColor: ambientLight.color.getHex(),
+        ambientIntensity: ambientLight.intensity,
+        resetAmbientLight: () => {
+            ambientColor.setValue('0xffffff');
+            ambientIntensity.setValue(0.8);
+        },
+
+        directLight: true,
+        directColor: directLight.color.getHex(),
+        directIntensity: directLight.intensity,
+        directPosX: -3.22,
+        directPosY: 8.82,
+        directPosZ: -27.37,
+        resetDirectLight: () => {
+            directColor.setValue('0xffffff');
+            directIntensity.setValue(0.3);
+            directPosX.setValue(-3.22);
+            directPosY.setValue(8.82);
+            directPosZ.setValue(-27.37);
+        },
+
+        hemiLight: true,
+        hemiLightHelper: false,
+        hemiSkyColor: hemiLight.color.getHex(),
+        hemiGroundColor: hemiLight.groundColor.getHex(),
+        hemiIntensity: hemiLight.intensity,
+        hemiPosX: 0,
+        hemiPosY: 0,
+        hemiPosZ: 0,
+        resetHemiLight: () => {
+            hemiSkyColor.setValue('0xd0d0d0');
+            hemiGroundColor.setValue('0x000000');
+            hemiIntensity.setValue(0.2);
+            hemiPosX.setValue(0);
+            hemiPosY.setValue(100);
+            hemiPosZ.setValue(0);
+        },
+
+        spotLight: false,
+        spotLightHelper: false,
+        spotColor: spotLight.color.getHex(),
+        spotIntensity: spotLight.intensity,
+        spotAngle: 0.3,
+        spotPenumbra: 0.2,
+        spotDecay: 2,
+        spotDistance: 10,
+        spotPosX: 12,
+        spotPosY: 36,
+        spotPosZ: 0,
+        resetSpotLight: () => {
+            spotColor.setValue('0xffffff');
+            spotIntensity.setValue(0.2);
+            spotAngle.setValue(0.3);
+            spotPenumbra.setValue(0.2);
+            spotDecay.setValue(2);
+            spotDistance.setValue(10);
+            spotPosX.setValue(0);
+            spotPosY.setValue(100);
+            spotPosZ.setValue(0);
+        },
+
+        pointLight: false,
+        pointLightHelper: false,
+        pointColor: pointLight.color.getHex(),
+        pointIntensity: pointLight.intensity,
+        pointDecay: 2,
+        pointDistance: 10,
+        pointPower: 0.5,
+        pointPosX: 12,
+        pointPosY: 36,
+        pointPosZ: 0,
+        resetPointLight: () => {
+            pointColor.setValue('0xffffff');
+            pointIntensity.setValue(0.2);
+            pointDecay.setValue(2);
+            pointDistance.setValue(10);
+            pointPosX.setValue(0);
+            pointPosY.setValue(100);
+            pointPosZ.setValue(0);
+        }
+
+    }
+
+    //#region 环境光
+    const ambientFloder = lightGui.addFolder('环境光');
+    // const ambientFloder = lightGui.addFolder('ambientLight');
+
+    ambientFloder.add(lightParams, "ambientLight").onChange((v) => ambientLight.visible = v);
+
+    var ambientColor = ambientFloder.addColor(lightParams, 'ambientColor').onChange(function (val) {
+        ambientLight.color.setHex(val);
+    });
+    var ambientIntensity = ambientFloder.add(lightParams, 'ambientIntensity', 0, 10).onChange(function (val) {
+        ambientLight.intensity = val;
+    });
+    ambientFloder.add(lightParams, 'resetAmbientLight').name('reset');
+    //#endregion
+
+    //#region 定向光
+    const directFloder = lightGui.addFolder('directLight');
+
+    directFloder.add(lightParams, "directLight").onChange((v) => directLight.visible = v);
+
+    var directColor = directFloder.addColor(lightParams, 'directColor').onChange(function (val) {
+        directLight.color.setHex(val);
+    });
+    var directIntensity = directFloder.add(lightParams, 'directIntensity', 0, 10).onChange(function (val) {
+        directLight.intensity = val;
+    });
+    var directPosX = directFloder.add(lightParams, 'directPosX', -100, 100).onChange(function (val) {
+        directLight.position.x = val;
+    });
+    var directPosY = directFloder.add(lightParams, 'directPosY', -100, 100).onChange(function (val) {
+        directLight.position.y = val;
+    });
+
+    var directPosZ = directFloder.add(lightParams, 'directPosZ', -100, 100).onChange(function (val) {
+        directLight.position.z = val;
+    });
+    directFloder.add(lightParams, 'resetDirectLight').name('reset');
+    // #endregion
+
+    //#region 半球光 
+    const hemiFloder = lightGui.addFolder('hemiLight');
+
+    hemiFloder.add(lightParams, "hemiLight").onChange((v) => {
+        if (v) {
+            viewer.scene.add(hemiLight);
+        } else {
+            viewer.scene.remove(hemiLight);
+        }
+    });
+    hemiFloder.add(lightParams, "hemiLightHelper").onChange((v) => {
+        if (v) {
+            viewer.scene.add(hemiLightHelper);
+        } else {
+            viewer.scene.remove(hemiLightHelper);
+        }
+    });
+
+    var hemiSkyColor = hemiFloder.addColor(lightParams, 'hemiSkyColor').onChange(function (val) {
+        hemiLight.color.setHex(val);
+    });
+    var hemiGroundColor = hemiFloder.addColor(lightParams, 'hemiGroundColor').onChange(function (val) {
+        hemiLight.groundColor.setHex(val);
+    });
+    var hemiIntensity = hemiFloder.add(lightParams, 'hemiIntensity', 0, 10).onChange(function (val) {
+        hemiLight.intensity = val;
+    });
+    var hemiPosX = hemiFloder.add(lightParams, 'hemiPosX', -100, 100).onChange(function (val) {
+        hemiLight.position.x = val;
+    });
+    var hemiPosY = hemiFloder.add(lightParams, 'hemiPosY', -100, 100).onChange(function (val) {
+        hemiLight.position.y = val;
+    });
+
+    var hemiPosZ = hemiFloder.add(lightParams, 'hemiPosZ', -100, 100).onChange(function (val) {
+        hemiLight.position.z = val;
+    });
+    hemiFloder.add(lightParams, 'resetHemiLight').name('reset');
+    //#endregion
+
+    //#region  聚光灯
+    const spotFloder = lightGui.addFolder('spotLight');
+    spotFloder.add(lightParams, "spotLight").onChange((v) => spotLight.visible = v);
+    spotFloder.add(lightParams, "spotLightHelper").onChange((v) => {
+        if (v) {
+            viewer.scene.add(spotLightHelper);
+        } else {
+            viewer.scene.remove(spotLightHelper);
+        }
+    });
+
+    var spotColor = spotFloder.addColor(lightParams, 'spotColor').onChange(function (val) {
+        spotLight.color.setHex(val);
+    });
+
+    var spotIntensity = spotFloder.add(lightParams, 'spotIntensity', 0, 10).onChange(function (val) {
+        spotLight.intensity = val;
+    });
+
+    var spotAngle = spotFloder.add(lightParams, 'spotAngle', 0, Math.PI / 2).onChange(function (val) {
+        spotLight.angle = val;
+        spotLightHelper.update();
+    });
+
+    var spotPenumbra = spotFloder.add(lightParams, 'spotPenumbra', 0, 1).onChange(function (val) {
+        spotLight.penumbra = val;
+    });
+
+    var spotDecay = spotFloder.add(lightParams, 'spotDecay', 0, 10).onChange(function (val) {
+        spotLight.decay = val;
+    });
+
+    var spotDistance = spotFloder.add(lightParams, 'spotDistance', -100, 100).onChange(function (val) {
+        spotLight.distance = val;
+        spotLightHelper.update();
+    });
+
+    var spotPosX = spotFloder.add(lightParams, 'spotPosX', -100, 100).onChange(function (val) {
+        spotLight.position.x = val;
+        spotLightHelper.update();
+    });
+
+    var spotPosY = spotFloder.add(lightParams, 'spotPosY', -100, 100).onChange(function (val) {
+        spotLight.position.y = val;
+        spotLightHelper.update();
+    });
+
+    var spotPosZ = spotFloder.add(lightParams, 'spotPosZ', -100, 100).onChange(function (val) {
+        spotLight.position.z = val;
+        spotLightHelper.update();
+    });
+    spotFloder.add(lightParams, 'resetSpotLight').name('reset');
+    // #endregion
+
+
+    //#region  点光源
+    const pointFloder = lightGui.addFolder('pointLight');
+    pointFloder.add(lightParams, "pointLight").onChange((v) => pointLight.visible = v);
+    pointFloder.add(lightParams, "pointLightHelper").onChange((v) => {
+        if (v) {
+            viewer.scene.add(pointLightHelper);
+        } else {
+            viewer.scene.remove(pointLightHelper);
+        }
+    });
+
+    var pointColor = pointFloder.addColor(lightParams, 'pointColor').onChange(function (val) {
+        pointLight.color.setHex(val);
+    });
+
+    var pointIntensity = pointFloder.add(lightParams, 'pointIntensity', 0, 10).onChange(function (val) {
+        pointLight.intensity = val;
+    });
+
+    var pointDecay = pointFloder.add(lightParams, 'pointDecay', 0, 10).onChange(function (val) {
+        pointLight.decay = val;
+    });
+
+    var pointDistance = pointFloder.add(lightParams, 'pointDistance', -100, 100).onChange(function (val) {
+        pointLight.distance = val;
+        pointLightHelper.update();
+    });
+
+    var pointPosX = pointFloder.add(lightParams, 'pointPosX', -100, 100).onChange(function (val) {
+        pointLight.position.x = val;
+        pointLightHelper.update();
+    });
+
+    var pointPosY = pointFloder.add(lightParams, 'pointPosY', -100, 100).onChange(function (val) {
+        pointLight.position.y = val;
+        pointLightHelper.update();
+    });
+
+    var pointPosZ = pointFloder.add(lightParams, 'pointPosZ', -100, 100).onChange(function (val) {
+        pointLight.position.z = val;
+        pointLightHelper.update();
+    });
+    pointFloder.add(lightParams, 'resetPointLight').name('reset');
+    // #endregion
+
+
+    //#region 改变颜色的色调和饱和度
+    const hueSaturationPass = new THREE.ShaderPass(THREE.HueSaturationShader);
+    viewer.addPass(hueSaturationPass);
+
+    // 改变亮度和对比度
+    const brightnessContrastPass = new THREE.ShaderPass(THREE.BrightnessContrastShader);
+    viewer.addPass(brightnessContrastPass);
+
+    const gui2 = viewer.gui.addFolder('Shader');
+    const params2 = {
+        hueSaturationParams: {
+            hue: hueSaturationPass.uniforms['hue'].value,
+            saturation: hueSaturationPass.uniforms['saturation'].value
+        },
+        brightnessContrastParams: {
+            brightness: hueSaturationPass.uniforms['hue'].value,
+            contrast: hueSaturationPass.uniforms['saturation'].value
+        },
+        reset: () => {
+            hue.setValue(0);
+            saturation.setValue(0);
+            brightness.setValue(0);
+            contrast.setValue(0);
+        }
+    }
+    var hue = gui2.add(params2.hueSaturationParams, 'hue', -1, 1, 0.1).name('色调').onChange(function (val) {
+        hueSaturationPass.uniforms['hue'].value = val;
+    });
+    var saturation = gui2.add(params2.hueSaturationParams, 'saturation', -1, 1, 0.1).name('饱和度').onChange(function (val) {
+        hueSaturationPass.uniforms['saturation'].value = val;
+    });
+
+    var brightness = gui2.add(params2.brightnessContrastParams, 'brightness', -1, 1, 0.1).name('亮度').onChange(function (val) {
+        brightnessContrastPass.uniforms['brightness'].value = val;
+    });
+    var contrast = gui2.add(params2.brightnessContrastParams, 'contrast', -1, 1, 0.1).name('对比度').onChange(function (val) {
+        brightnessContrastPass.uniforms['contrast'].value = val;
+    });
+    gui2.add(params2, 'reset')
+    // #endregion
+
+
+    // 创建色板
+    function initSwatch() {
+        const Tray = document.getElementById('tray');
+        const textures = [
+            {
+                url: './img/1.jpeg',
+                scale: { x: 1, y: 1 }
+            },
+            {
+                url: './img/2.jpg',
+                scale: { x: 1, y: 1 }
+            },
+            {
+                url: './img/3.png',
+                scale: { x: 1, y: 1 }
+            },
+            {
+                url: './img/4.webp',
+                scale: { x: 1, y: 1 }
+            },
+            {
+                url: './img/5.jpg',
+                scale: { x: 1, y: 1 }
+            },
+            {
+                url: './img/6.jpg',
+                scale: { x: 1, y: 1 }
+            },
+            {
+                url: './img/7.jpg',
+                scale: { x: 1, y: 1 }
+            },
+            {
+                url: './img/8.jpg',
+                scale: { x: 1, y: 1 }
+            },
+
+
+        ]
+        buildTextures(textures);
+
+        function buildTextures(textures) {
+            for (let [i, texture] of textures.entries()) {
+                let swatch = document.createElement('div');
+                swatch.classList.add('tray_swatch');
+
+                swatch.style.backgroundImage = `url(${texture.url})`;
+
+                swatch.setAttribute('data-key', i);
+                Tray.append(swatch);
+            }
+        }
+        // Swatches
+        const swatches = document.querySelectorAll(".tray_swatch");
+
+        for (const swatch of swatches) {
+            swatch.addEventListener('click', selectSwatch);
+        }
+        function selectSwatch(e) {
+            let texture = textures[parseInt(e.target.dataset.key)];
+            changeTexture(texture);
+        }
+    }
+
+    // 选中色板切换成当前选中构件的纹理
+    function changeTexture(params) {
+        if (!viewer.selectedFeatures.length) return;
+
+        viewer.selectedFeatures.forEach(f => {
+            const materials = f.primitive.getMaterials(f.name);
+
+            new THREE.TextureLoader().load(params.url, texture => {
+                // texture.wrapS = texture.wrapT = THREE.MirroredRepeatWrapping;
+                texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                texture.matrixAutoUpdate = false;
+                console.log(texture)
+                materials.forEach(m => {
+                    m.map = texture;
+                    // 调整纹理尺寸
+                    m.map.matrix.identity().scale(params.scale.x, params.scale.y);
+                    // 让纹理颜色不受顶点着色的影响
+
+                })
+
+            });
+
+            f.setColor(0xffffff);
+            f.lock('color');
+
+        })
+
+        // viewer.clearSelection();
+
+        // const f = viewer.getPrimitiveByName("mesh_2")
+
+        // const materials = f.primitive.getMaterials("mesh_2");
+
+        // new THREE.TextureLoader().load(params.url, texture => {
+        //     // texture.wrapS = texture.wrapT = THREE.MirroredRepeatWrapping;
+        //     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+        //     texture.matrixAutoUpdate = false;
+        //     // console.log(texture)
+        //     materials.forEach(m => {
+        //         m.map = texture;
+        //         // 调整纹理尺寸
+        //         m.map.matrix.identity().scale(params.scale.x, params.scale.y);
+        //         // 让纹理颜色不受顶点着色的影响
+
+        //     })
+
+        // });
+
+        // f.primitive.setColor(0xffffff);
+        // f.primitive.lock(f.instanceID, 'color');
+    }
+
+</script>
+
+<script src="./lib/Pass.js"></script>
+<script src="./lib/CopyShader.js"></script>
+<script src="./lib/SSAOShader.js"></script>
+<script src="./lib/SimplexNoise.js"></script>
+<script src="./lib/SSAOPass.js"></script>
+<script src="./lib/RenderPass.js"></script>
+<script src="./lib/ShaderPass.js"></script>
+<script src="./lib/FXAAShader.js"></script>
+<script src="./lib/SSAARenderPass.js"></script>
+<script src="./lib/HueSaturationShader.js"></script>
+<script src="./lib/BrightnessContrastShader.js"></script>
+<script src="./lib/HorizontalBlurShader.js"></script>
+<script src="./lib/VerticalBlurShader.js"></script>
+<script src="./lib/DRACOLoader.js"></script>
+<script src="./lib/GLTFLoader.js"></script>
+
+</html>
