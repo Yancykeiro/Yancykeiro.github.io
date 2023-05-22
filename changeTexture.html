@@ -1,0 +1,214 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>材质替换</title>
+</head>
+<link rel="stylesheet" type="text/css" href="./index.css" />
+<link rel="stylesheet" type="text/css" href="./main.css" />
+<script src="https://unpkg.com/three@0.132.1/build/three.js"></script>
+<style>
+    #tray {
+        position: absolute;
+        top: 200px;
+        width: 80px;
+        height: auto;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        left: 20px;
+    }
+
+    .tray_swatch {
+        width: 80px;
+        height: 80px;
+        background-size: 100% 100%;
+    }
+
+    #tip {
+        margin-bottom: 20px;
+        background-color: #f2f2f2;
+        color: #333;
+        font-family: Arial, sans-serif;
+        font-size: 16px;
+        padding: 10px 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+
+    }
+</style>
+
+<body>
+    <div id="container"></div>
+    <div id="tray"></div>
+
+    <div
+        style="display: flex;justify-content: center;align-items: flex-end;height: 100%;align-content: center;pointer-events: none;z-index: 888">
+        <span id="tip"> 请先点击椅子坐垫后再点击右侧图片</span>
+    </div>
+
+
+
+
+
+</body>
+
+<script type="module">
+
+    import { Viewer, Model, CombineMesh, CombineEdge, TzMaterial } from './tzlib.js';
+
+
+    const viewer = (window.viewer = new Viewer({
+        container: 'container',
+        debug: true,
+        grid: true,
+        requestRenderMode: false, //自动渲染
+        texturePath: 'images/',
+        shadowLowerOffset: 0
+    }));
+
+    viewer.preRender = function (delta) {
+        viewer.primitives.children.filter(i => i.isCombineMesh).forEach(c => c.update(delta));
+    }
+    viewer.disableHover();
+    load()
+
+
+    async function load(isOldFormat = false) {
+        const files = [
+            'SheenChair.glb',
+        ]
+
+        const list = files.map(value => `models/${value}`)
+
+
+        console.time("load")
+        return viewer.loadCombineModel(list).then(() => {
+            console.timeEnd("load")
+
+            viewer.enableShadow = true;
+            viewer.primitives.children.forEach((c) => {
+                c.receiveShadow = true;
+                c.castShadow = true;
+                c.rotateY(135)
+            });
+            viewer.updateShadow();
+            viewer.flyHome();
+            // 自定义纹理切换面板
+            initSwatch();
+
+        });
+    }
+
+    viewer.selectedEntityChanged.addEventListener(async function (lastArray, currArray) {
+        console.log(currArray, lastArray)
+        for (const l of lastArray) {
+            l.resetColor();
+            // l.resetOutline();
+        }
+
+        for (const curr of currArray) {
+            curr.setColor(0x7db8f0);
+            // curr.setOutline(0x7db8f0)
+        }
+    }, viewer);
+
+
+
+    // 创建色板
+    function initSwatch() {
+        const Tray = document.getElementById('tray');
+        const textures = [
+            {
+                url: './img/1.jpeg',
+                scale: { x: 1, y: 1 }
+            },
+            {
+                url: './img/2.jpg',
+                scale: { x: 1, y: 1 }
+            },
+            {
+                url: './img/3.png',
+                scale: { x: 1, y: 1 }
+            },
+            {
+                url: './img/4.webp',
+                scale: { x: 1, y: 1 }
+            },
+            {
+                url: './img/5.jpg',
+                scale: { x: 1, y: 1 }
+            },
+            {
+                url: './img/6.jpg',
+                scale: { x: 1, y: 1 }
+            },
+            {
+                url: './img/7.jpg',
+                scale: { x: 1, y: 1 }
+            },
+            {
+                url: './img/8.jpg',
+                scale: { x: 1, y: 1 }
+            },
+
+
+        ]
+        buildTextures(textures);
+
+        function buildTextures(textures) {
+            for (let [i, texture] of textures.entries()) {
+                let swatch = document.createElement('div');
+                swatch.classList.add('tray_swatch');
+
+                swatch.style.backgroundImage = `url(${texture.url})`;
+
+                swatch.setAttribute('data-key', i);
+                Tray.append(swatch);
+            }
+        }
+        // Swatches
+        const swatches = document.querySelectorAll(".tray_swatch");
+
+        for (const swatch of swatches) {
+            swatch.addEventListener('click', selectSwatch);
+        }
+        function selectSwatch(e) {
+            let texture = textures[parseInt(e.target.dataset.key)];
+            changeTexture(texture);
+        }
+    }
+
+    // 选中色板切换成当前选中构件的纹理
+    function changeTexture(params) {
+        if (!viewer.selectedFeatures.length) return;
+
+        viewer.selectedFeatures.forEach(f => {
+            const materials = f.primitive.getMaterials(f.name);
+
+            new THREE.TextureLoader().load(params.url, texture => {
+                // texture.wrapS = texture.wrapT = THREE.MirroredRepeatWrapping;
+                texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                texture.matrixAutoUpdate = false;
+                console.log(texture)
+                materials.forEach(m => {
+                    m.map = texture;
+                    // 调整纹理尺寸
+                    m.map.matrix.identity().scale(params.scale.x, params.scale.y);
+                    // 让纹理颜色不受顶点着色的影响
+
+                })
+
+            });
+
+            f.setColor(0xffffff);
+            f.lock('color');
+
+        })
+
+    }
+
+</script>
+
+</html>
