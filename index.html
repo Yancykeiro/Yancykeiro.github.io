@@ -3,11 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>个人主页</title>
+    <title>主页</title>
     <style>
         /* 全局样式 */
         body {
-            font-family: Arial, sans-serif;
+
             margin: 0;
             padding: 0;
         }
@@ -395,7 +395,7 @@
 
 <body>
     <nav class="navbar">
-        <a href="#" class="navbar-brand">个人主页</a>
+        <a href="#" class="navbar-brand">YANGSI</a>
         <ul class="navbar-nav">
             <li class="nav-item"><a href="#profile-section" class="nav-link">个人信息</a></li>
             <li class="nav-item"><a href="#demos-section" class="nav-link">Demo</a></li>
@@ -404,7 +404,7 @@
         </ul>
     </nav>
 
-    <div class="slideshow-container">
+    <!-- <div class="slideshow-container">
         <div class="mySlides fade">
             <img src="https://picsum.photos/800/300?random=1" alt="slide1">
         </div>
@@ -417,17 +417,17 @@
 
         <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
         <a class="next" onclick="plusSlides(1)">&#10095;</a>
-    </div>
+    </div> -->
 
     <div id="profile-section" class="profile-section">
         <div class="profile-image">
             <img src="https://picsum.photos/200" alt="Profile Image">
         </div>
         <h2 class="profile-name">杨思</h2>
-        <div class="profile-job-title">前端开发</div>
-        <div class="profile-bio">
+        <!-- <div class="profile-job-title">前端开发</div> -->
+        <!-- <div class="profile-bio">
             这里填写您的个人介绍，可以是一段简短的自我介绍，也可以是描述您的技能和经验的内容。
-        </div>
+        </div> -->
         <div>
             <span class="tech-tag">HTML</span>
             <span class="tech-tag">CSS</span>
@@ -445,6 +445,7 @@
 
     <div id="demos-section" class="demos-section">
         <h2 class="blog-posts-header">Demo</h2>
+        <p>推荐</p>
         <div class="demo">
             <div class="demo-image">
                 <img src="./images/i3.jpg" alt="Demo Image">
@@ -453,7 +454,10 @@
             <div class="demo-content">
                 <h3 class="demo-title">全景图</h3>
                 <div class="demo-description">
-                    左右两栏分别为全景图视图和模型视图，全景图通过鼠标右键旋转可以看到360视角，点击关联按钮，可以使左右两边联动。
+                    &emsp;&emsp;这个演示程序中包含两个场景：全景图和模型视图。
+                    全景图只能进行旋转，而模型视图可以进行旋转、平移和缩放。
+                    当按下“关联”按钮后，这两个场景就会相互连接起来。
+                    此时，模型视图也只能旋转，旋转一个场景会使另一个场景跟随旋转且旋转角度相同。
                 </div>
                 <a href="./panorama.html" class="demo-link">查看详情</a>
             </div>
@@ -465,7 +469,7 @@
             <div class="demo-content">
                 <h3 class="demo-title">模型材质替换</h3>
                 <div class="demo-description">
-                    这是一个可以替换模型材质的演示程序。请先单击选中组件，然后再单击左侧的面料图片。同一个构件更换材质无需重复选择模型，只需通过点击左侧的图片即可完成切换。
+                    &emsp;&emsp;这是一个可以替换模型材质的演示程序。请先单击选中组件，然后再单击左侧的面料图片。同一个构件更换材质无需重复选择模型，只需通过点击左侧的图片即可完成切换。
                 </div>
                 <a href="./changeTexture.html" class="demo-link">查看详情</a>
             </div>
@@ -477,7 +481,7 @@
             <div class="demo-content">
                 <h3 class="demo-title">光照、阴影、HSLC调节</h3>
                 <div class="demo-description">
-                    这个演示程序允许用户对一些参数进行实时调节，通过这些参数的调节，用户可以改变场景中物体的外观和光照效果，从而产生不同的视觉效果。
+                    &emsp;&emsp;这个演示程序允许用户对一些参数进行实时调节，通过这些参数的调节，用户可以改变场景中物体的外观和光照效果，从而产生不同的视觉效果。
                     其中光源的控制包括颜色、强度方向等，光源中环境光和方向光是默认开启的，半球光、聚光灯和点光源需开启后再进行参数调节。
                     另外还可以对HSLC（即色调、饱和度、亮度和对比度）以及投影的颜色、高度、透明度和虚化度等进行调节。
 
