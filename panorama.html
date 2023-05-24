@@ -6,38 +6,184 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>panorama</title>
+    <script src="https://unpkg.com/three@0.132.1/build/three.js"></script>
     <style>
         #container {
-            overflow: hidden;
+            display: flex;
+            flex-wrap: wrap;
             position: absolute;
-            left: 0;
-            top: 0;
             width: 100%;
             height: 100%;
-            background-image: url("./images/loading.jpg");
+            /* overflow: hidden;
+            
+            left: 0;
+            top: 0;*/
+
+            /*  */
+            /* background-image: url("./images/loading.jpg");
             background-repeat: no-repeat;
             background-position: center center;
             background-size: contain;
+            background-color: white; */
+        }
+
+        #left,
+        #right {
+            flex: 1;
+            min-width: 50%;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            #left,
+            #right {
+                flex: 1;
+                min-width: 100%;
+                min-height: 50%;
+            }
+        }
+
+        .center {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            height: 100%;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        .button {
+            font-family: Arial, sans-serif;
             background-color: white;
+            border: none;
+            color: #333;
+            padding: 15px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 18px;
+            margin: 10px 5px;
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.5);
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 999;
+        }
+
+        #enableSync {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            border: none;
+            color: #333;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 18px;
+            margin: 10px 5px;
+            cursor: pointer;
+            box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.5);
+            pointer-events: auto;
+        }
+
+        #disableSync {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            border: none;
+            color: #333;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 18px;
+            margin: 10px 5px;
+            cursor: pointer;
+            box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.5);
+            pointer-events: auto;
         }
     </style>
 
 </head>
 
 <body>
+    <div class="center">
+        <button id="enableSync">联动</button>
+        <button id="disableSync">取消联动</button>
+    </div>
+
     <div id="container">
+        <div id="left"></div>
+        <div id="right"></div>
 
     </div>
+
+
+    <button class="button" onclick="window.location.href='index.html'">返回</button>
+
 
 </body>
 <script type="module">
 
-    import { Viewer, PanoramaController, THREE } from './tzlib.js';
+    import { Viewer, PanoramaController } from './tzlib.js';
 
-    ;
+    const viewer = (window.viewer = new Viewer({
+        container: 'right',
+        debug: false,
+        grid: true,
+        requestRenderMode: false, //自动渲染
+        // centerPointMark: aCenter,
+        texturePath: 'images/',
+        shadowLowerOffset: 0,
+        maxDistance: 100000,
+        fogDistance: 1000000,
+        planeSize: 1000000
+    }));
+
+    // 加载模型
+    const dracoLoader = new THREE.DRACOLoader();
+    dracoLoader.setDecoderPath('lib/draco/gltf/');
+
+    const loader = new THREE.GLTFLoader();
+    loader.setDRACOLoader(dracoLoader);
+
+
+    const defaultHpr = {
+        heading: 135,
+        pitch: Math.PI * 2 / 5,
+    };
+    loader.load('./models/forest_house.glb', function (gltf) {
+
+        viewer.primitives.add(...gltf.scene.children);
+        viewer.primitives.getBoundingBox(new THREE.Box3()).getCenter(viewer.boundingBoxCenter);
+        // viewer.flyHome();
+        viewer.primitives.children.forEach((c) => {
+            c.receiveShadow = true;
+            c.castShadow = true;
+
+        });
+
+        const heading = viewer.mainControl.azimuthAngle - ((viewer.mainControl.azimuthAngle % (Math.PI * 2)) - Math.PI);
+
+        const polar = viewer.mainControl.polarAngle - (viewer.mainControl.polarAngle % Math.PI);
+
+        viewer.mainControl.fitToSphere(viewer.primitives.getBoundingSphere(new THREE.Sphere()), true, {
+            heading: heading + defaultHpr.heading,
+            pitch: polar + defaultHpr.pitch,
+        });
+    });
+
+
 
     const options = {
-        container: 'container',
+        container: 'left',
         requestRenderMode: false,
         texturePath: '../images/',
         shadowLowerOffset: 0,
@@ -46,29 +192,29 @@
         planeSize: 1000000
     }
 
-    const viewer = new Viewer(options);
-
-    const geometry = new THREE.SphereGeometry(1000);
-    const material = new THREE.MeshBasicMaterial({ side: THREE.BackSide, map: new THREE.TextureLoader().load("../images/i3.jpg") });
-    const sphere = new THREE.Mesh(geometry, material);
-    viewer.scene.add(sphere);
-
-    viewer.mainControl.setLookAt(1, 1, 1, 0, 0, 0);
-
-    // viewer.mainControl.mouseButtons.left = ACTION.NONE;
-    // viewer.mainControl.mouseButtons.middle = ACTION.NONE;
-    // viewer.mainControl.mouseButtons.wheel = ACTION.DOLLY;
-
-    viewer.scene.remove(this.viewer.centerMark);
 
 
 
-    // const p = new PanoramaController(options, viewer);
-    // const url = "./images/i3.jpg";
+    const p = new PanoramaController(options, viewer);
+    const url = "./images/i3.jpg";
 
-    // p.loadImage(url);
-    // p.enable();
+    p.loadImage(url);
+    p.enable();
+
+    const enableSync = document.getElementById("enableSync");
+
+    enableSync.addEventListener("click", function () {
+        p.enableSync = true;
+    });
+    const disableSync = document.getElementById("disableSync");
+
+    disableSync.addEventListener("click", function () {
+        p.disable();
+    });
+
 
 </script>
+<script src="./lib/DRACOLoader.js"></script>
+<script src="./lib/GLTFLoader.js"></script>
 
 </html>
