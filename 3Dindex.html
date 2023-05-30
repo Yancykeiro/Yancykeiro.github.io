@@ -110,7 +110,7 @@
 
         #menu {
             position: absolute;
-            bottom: 20px;
+            bottom: 60px;
             width: 100%;
             text-align: center;
         }
@@ -176,16 +176,26 @@
             color: #000000;
             background-color: rgba(0, 255, 255, 0.75);
         }
+
+        #tips {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            color: rgba(127, 255, 255, 0.75);
+            font-size: 16px;
+        }
     </style>
 </head>
 
 <body>
     <div id="container"></div>
+    <p id="tips">点击上方按钮，暂停动画，点击H切换回2D主页，其他网页均在建设中...</p>
     <div id="menu">
-        <button id="table">TABLE</button>
-        <button id="sphere">SPHERE</button>
+        <button id="table">Pause</button>
+        <!-- <button id="sphere">SPHERE</button>
         <button id="helix">HELIX</button>
-        <button id="grid">GRID</button>
+        <button id="grid">GRID</button> -->
     </div>
 
     <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
@@ -531,28 +541,28 @@
 
             });
 
-            const buttonSphere = document.getElementById('sphere');
-            buttonSphere.addEventListener('click', function () {
-                clearTimeout(timerId);
-                transform(targets.sphere, 2000);
+            // const buttonSphere = document.getElementById('sphere');
+            // buttonSphere.addEventListener('click', function () {
+            //     clearTimeout(timerId);
+            //     transform(targets.sphere, 2000);
 
-            });
+            // });
 
-            const buttonHelix = document.getElementById('helix');
-            console.log("h", buttonHelix)
-            buttonHelix.addEventListener('click', function () {
-                clearTimeout(timerId);
-                transform(targets.helix, 2000);
+            // const buttonHelix = document.getElementById('helix');
+            // console.log("h", buttonHelix)
+            // buttonHelix.addEventListener('click', function () {
+            //     clearTimeout(timerId);
+            //     transform(targets.helix, 2000);
 
-            });
+            // });
 
-            const buttonGrid = document.getElementById('grid');
-            buttonGrid.addEventListener('click', function () {
-                clearTimeout(timerId);
+            // const buttonGrid = document.getElementById('grid');
+            // buttonGrid.addEventListener('click', function () {
+            //     clearTimeout(timerId);
 
-                transform(targets.grid, 2000);
+            //     transform(targets.grid, 2000);
 
-            });
+            // });
 
 
 
