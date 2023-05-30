@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>panorama</title>
+    <script src="https://unpkg.com/three@0.132.1/build/three.js"></script>
+    <link rel="stylesheet" type="text/css" href="./demo.css" />
+    <link rel="stylesheet" type="text/css" href="./main.css" />
+    <style>
+        #container {
+            display: flex;
+            flex-wrap: wrap;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        #left,
+        #right {
+            flex: 1;
+            min-width: 50%;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            #left,
+            #right {
+                flex: 1;
+                min-width: 100%;
+                min-height: 50%;
+            }
+        }
+
+        .center {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            height: 100%;
+            width: 100%;
+            pointer-events: none;
+        }
+    </style>
+
+</head>
+
+<body>
+
+
+    <div class="center">
+        <div class="switch">
+            <input type="checkbox" name="toggle">
+            <label for="toggle"><i></i></label>
+            <span></span>
+        </div>
+    </div>
+
+    <div id="container">
+        <div id="left"></div>
+        <div id="right"></div>
+
+    </div>
+
+
+    <button class="button" onclick="window.location.href='../index.html'">返回</button>
+
+
+</body>
+<script type="module">
+
+    import { Viewer, PanoramaController, Model, CombineEdge, CombineMesh } from './tzlib.js';
+
+    const viewer = (window.viewer = new Viewer({
+        container: 'right',
+        debug: false,
+        grid: true,
+        requestRenderMode: false, //自动渲染
+        // centerPointMark: aCenter,
+        texturePath: 'img/',
+        shadowLowerOffset: 0,
+        maxDistance: 100000,
+        fogDistance: 1000000,
+        planeSize: 1000000
+    }));
+
+    viewer.disableHover();
+    load()
+
+
+    async function load(isOldFormat = false) {
+        const files = [
+            'light.glb',
+        ]
+        const list = files.map(value => `http://127.0.0.1:5502/demo/models/${value}`)
+        // const list = files.map(value => `./models/51/${value}`)
+        // // 加载线框
+        // const edgeFiles = list.map(value => value.slice(0, value.lastIndexOf(".")).concat('_edge.glb'));
+        // const gltfs = await Promise.all(edgeFiles.map(edge =>
+        //     Model.rawFromGltf({
+        //         url: edge,
+        //     })));
+        // const edge = new CombineEdge().fromObjects(gltfs.map(gltf => gltf.scene));
+        // CombineMesh.edgeObject = edge;
+        // viewer.scene.add(edge);
+
+        // console.time("load")
+        return viewer.rawLoad1(list).then(() => {
+            // console.timeEnd("load")
+            // viewer.flyHome();
+            viewer.mainControl.setLookAt(0, 15, 30, 0, 10, 10)
+            viewer.enableShadow = true;
+            viewer.primitives.children.forEach((c) => {
+                c.receiveShadow = true;
+                c.castShadow = true;
+            });
+            viewer.updateShadow();
+            // shadowFar.setValue(100);
+
+
+        });
+    }
+    const ambientLight = viewer.lights.find((l) => l.name === 'ambient_light');
+    ambientLight.intensity = 2
+    const directLight = viewer.lights.find((l) => l.name === 'main_light');
+    directLight.intensity = 1;
+
+
+
+    // // 加载模型
+    // const dracoLoader = new THREE.DRACOLoader();
+    // dracoLoader.setDecoderPath('lib/draco/gltf/');
+
+    // const loader = new THREE.GLTFLoader();
+    // loader.setDRACOLoader(dracoLoader);
+
+
+    // const defaultHpr = {
+    //     heading: 135,
+    //     pitch: Math.PI * 2 / 5,
+    // };
+    // loader.load('./models/forest_house.glb', function (gltf) {
+
+    //     viewer.primitives.add(...gltf.scene.children);
+    //     viewer.primitives.getBoundingBox(new THREE.Box3()).getCenter(viewer.boundingBoxCenter);
+    //     // viewer.flyHome();
+    //     viewer.primitives.children.forEach((c) => {
+    //         c.receiveShadow = true;
+    //         c.castShadow = true;
+
+    //     });
+
+    //     const heading = viewer.mainControl.azimuthAngle - ((viewer.mainControl.azimuthAngle % (Math.PI * 2)) - Math.PI);
+
+    //     const polar = viewer.mainControl.polarAngle - (viewer.mainControl.polarAngle % Math.PI);
+
+    //     viewer.mainControl.fitToSphere(viewer.primitives.getBoundingSphere(new THREE.Sphere()), true, {
+    //         heading: heading + defaultHpr.heading,
+    //         pitch: polar + defaultHpr.pitch,
+    //     });
+    // });
+
+
+
+    const options = {
+        container: 'left',
+        requestRenderMode: false,
+        texturePath: './img/',
+        shadowLowerOffset: 0,
+        maxDistance: 100000,
+        fogDistance: 1000000,
+        planeSize: 1000000
+    }
+
+
+
+
+    const p = new PanoramaController(options, viewer);
+    const url = "./img/i3.jpg";
+
+
+    p.loadImage(url);
+    p.enable();
+
+
+
+    const myCheckbox = document.getElementsByName('toggle')[0];
+    myCheckbox.addEventListener('change', function () {
+        if (this.checked) {
+            p.enableSync = true;
+        } else {
+            p.disable();
+        }
+    });
+
+
+
+
+</script>
+<script src="./lib/DRACOLoader.js"></script>
+<script src="./lib/GLTFLoader.js"></script>
+
+</html>

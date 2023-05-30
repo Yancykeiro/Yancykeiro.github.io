@@ -1,0 +1,142 @@
+#aaa {
+    position: absolute;
+    left: 10px;
+    top: 100px;
+    width: 256px;
+    height: 256px;
+    background-color: red;
+}
+
+/* 旋转中心点 */
+div.center-mark {
+    border: 1px solid #ffffff;
+    width: 11px;
+    height: 11px;
+    border-radius: 5px;
+    background: #7db8f0;
+    animation: sk-scaleout 1.0s infinite ease-in-out;
+}
+
+
+#aaa canvas {
+    margin: 0 auto;
+}
+
+@keyframes sk-scaleout {
+    0% {
+        /*-webkit-transform: scale(0);*/
+        /*transform: scale(0);*/
+    }
+    100% {
+        /*-webkit-transform: scale(1.0);*/
+        /*transform: scale(1.0);*/
+        opacity: 0;
+    }
+}
+
+
+/* 拖动锚点 */
+div.anchor {
+    border: 2px solid #ffffff;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background: #7db8f0;
+}
+
+div.anchor:hover {
+    cursor: move;
+}
+
+.measureDistanceLabel .XYZLabel {
+    height: 20px;
+    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.32);
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    border-radius: 3px;
+    overflow: hidden;
+    width: auto;
+    margin-top: 2px;
+}
+.measureDistanceLabel .XYZLabel.hidden {
+    display: none;
+}
+
+.measureDistanceLabel .XYZLabel .aside {
+    flex: 0 0 20px;
+    text-align: center;
+}
+.measureDistanceLabel .XYZLabel .aside.green {
+    background-color: #26bd85;
+}
+.measureDistanceLabel .XYZLabel .aside.red {
+    background-color: #e54e4e;
+}
+.measureDistanceLabel .XYZLabel .aside.blue {
+    background-color: #2b78d6;
+}
+
+.measureDistanceLabel .XYZLabel .main {
+    flex: 1 1;
+    background-color: #ffffff;
+    text-align: center;
+}
+.measureDistanceLabel .XYZLabel .main.green {
+    color: #26bd85;
+}
+.measureDistanceLabel .XYZLabel .main.red {
+    color: #e54e4e;
+}
+.measureDistanceLabel .XYZLabel .main.blue {
+    color: #2b78d6;
+}
+
+/* 测量面积、角度 */
+.measure,
+.measureHeight {
+    text-align: center;
+    background-color: #7db8f0;
+    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.32);
+    height: 24px;
+    line-height: normal;
+    border-radius: 4px;
+    padding: 0 10px;
+    font-size: 14px;
+    border: 2px solid rgba(0, 0, 0, 0);
+}
+
+.measure:hover,
+.measureHeight:hover {
+    background-color: #acd8fc !important;
+    cursor: pointer;
+}
+
+.measure.focus,
+.measureHeight.focus {
+    border: 2px solid #ffffff;
+    cursor: move;
+}
+
+.measureHeight:after {
+    content: '';
+    background: url('./images/heightIcon.png') no-repeat;
+    background-size: 100% 100%;
+    display: block;
+    position: relative;
+    right: 15px;
+    margin-top: 2px;
+    width: calc(100% + 30px);
+    height: 100%;
+}
+
+/* 测量中途鼠标变化 */
+.measurement-cursor {
+    cursor: url('./images/measure.ico') 16 16, auto !important;
+}
+
+.tzSelectBox {
+    border: 1px solid #55aaff;
+    background-color: rgba(75, 160, 255, 0.3);
+    position: fixed;
+}

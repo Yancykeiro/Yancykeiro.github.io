@@ -4,393 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>主页</title>
-    <style>
-        /* 全局样式 */
-        body {
-
-            margin: 0;
-            padding: 0;
-        }
-
-        a {
-            color: inherit;
-            text-decoration: none;
-        }
-
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6 {
-            font-weight: normal;
-        }
-
-        /* 导航栏样式 */
-        .navbar {
-            background-color: #333;
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .navbar-brand {
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .navbar-nav {
-            display: flex;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        .nav-item {
-            margin-right: 20px;
-        }
-
-        .nav-link {
-            font-size: 18px;
-            padding: 10px;
-            transition: all 0.2s ease-in-out;
-        }
-
-        .nav-link:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
-        }
-
-        /* 轮播图样式 */
-        .slideshow-container {
-            max-width: 800px;
-            margin: 0 auto;
-            position: relative;
-        }
-
-        .mySlides {
-            display: none;
-            text-align: center;
-        }
-
-        .mySlides img {
-            width: 100%;
-            height: auto;
-        }
-
-        .prev,
-        .next {
-            cursor: pointer;
-            position: absolute;
-            top: 50%;
-            width: auto;
-            padding: 16px;
-            margin-top: -22px;
-            color: white;
-            font-weight: bold;
-            font-size: 18px;
-            transition: 0.6s ease;
-            border-radius: 0 3px 3px 0;
-            user-select: none;
-        }
-
-        .next {
-            right: 0;
-            border-radius: 3px 0 0 3px;
-        }
-
-        .prev:hover,
-        .next:hover {
-            background-color: rgba(0, 0, 0, 0.8);
-        }
-
-        /* 个人信息样式 */
-        .profile-section {
-            max-width: 800px;
-            margin: 50px auto;
-            text-align: center;
-        }
-
-        .profile-image {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            overflow: hidden;
-            margin: 0 auto;
-        }
-
-        .profile-image img {
-            width: 100%;
-            height: auto;
-        }
-
-        .profile-name {
-            font-size: 36px;
-            font-weight: bold;
-            margin-top: 20px;
-            margin-bottom: 10px;
-        }
-
-        .profile-job-title {
-            font-size: 24px;
-            color: #888;
-            margin-bottom: 20px;
-        }
-
-        .profile-bio {
-            font-size: 18px;
-            line-height: 1.5;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* 博客文章样式 */
-        .blog-posts-section {
-            max-width: 800px;
-            margin: 50px auto;
-        }
-
-        .blog-posts-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .blog-post {
-            margin-bottom: 30px;
-            border-radius: 5px;
-            overflow: hidden;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .blog-post-image {
-            width: 100%;
-            height: 250px;
-            overflow: hidden;
-        }
-
-        .blog-post-image img {
-            width: 100%;
-            height: auto;
-        }
-
-        .blog-post-content {
-            padding: 20px;
-        }
-
-        .blog-post-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .blog-post-date {
-            font-size: 16px;
-            color: #888;
-            margin-bottom: 10px;
-        }
-
-        .blog-post-excerpt {
-            font-size: 18px;
-            line-height: 1.5;
-        }
-
-        /* Demo展示样式 */
-        .demos-section {
-            max-width: 800px;
-            margin: 50px auto;
-        }
-
-        .demo {
-            margin-bottom: 30px;
-            border-radius: 5px;
-            overflow: hidden;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .demo-image {
-            width: 100%;
-            height: 250px;
-            overflow: hidden;
-        }
-
-        .demo-image img {
-            width: 100%;
-            height: auto;
-        }
-
-        .demo-content {
-            padding: 20px;
-        }
-
-        .demo-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .demo-description {
-            font-size: 18px;
-            line-height: 1.5;
-            margin-bottom: 20px;
-        }
-
-        .demo-link {
-            display: inline-block;
-            font-size: 18px;
-            padding: 10px 20px;
-            background-color: #333;
-            color: white;
-            border-radius: 5px;
-            transition: all 0.2s ease-in-out;
-        }
-
-        .demo-link:hover {
-            background-color: #555;
-        }
-
-        /* 联系方式样式 */
-        .contact-section {
-            max-width: 800px;
-            margin: 50px auto;
-            text-align: center;
-        }
-
-        .contact-link {
-            display: inline-block;
-            font-size: 18px;
-            padding: 10px 20px;
-            background-color: #333;
-            color: white;
-            border-radius: 5px;
-            transition: all 0.2s ease-in-out;
-            margin-right: 20px;
-        }
-
-        .contact-link:last-child {
-            margin-right: 0;
-        }
-
-        .contact-link:hover {
-            background-color: #555;
-        }
-
-        .tech-tag {
-            display: inline-block;
-            padding: 5px 10px;
-            margin: 5px;
-            background-color: #f5f5f5;
-            color: #333;
-            border-radius: 20px;
-        }
-
-        .tech-tag:hover {
-            background-color: #333;
-            color: #fff;
-            cursor: pointer;
-        }
-
-        .contact-info {
-            /* max-width: 300px; */
-
-            margin: 30px auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-
-        .contact-info h2 {
-            margin-top: 0;
-            font-size: 24px;
-            color: #fff;
-            text-transform: uppercase;
-            background-color: #333;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-            position: relative;
-            z-index: 1;
-        }
-
-        .contact-info:before {
-            content: "";
-            display: block;
-            height: 100%;
-            width: 100%;
-            background-color: #f8f8f8;
-            position: absolute;
-            top: -10px;
-            left: -10px;
-            z-index: -1;
-        }
-
-        .contact-info p {
-            margin: 20px 0;
-            font-size: 16px;
-            line-height: 1.4;
-            /* color: #333; */
-            background-color: #f8f8f8;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-            position: relative;
-            z-index: 1;
-        }
-
-        .contact-info ul {
-            margin: 0;
-            padding: 0;
-            list-style: none;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .contact-info li {
-            margin: 20px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .contact-info a {
-            display: block;
-            width: 60px;
-            height: 60px;
-            background-color: #333;
-            color: #fff;
-            font-size: 24px;
-            line-height: 60px;
-            text-align: center;
-            text-decoration: none;
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-            transition: background-color 0.3s ease;
-            position: relative;
-            z-index: 1;
-        }
-
-        .contact-info a:hover {
-            background-color: #555;
-            color: #fff;
-        }
-
-        .icon {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            margin: 10px;
-        }
-
-        .icon img {
-            max-width: 100%;
-            max-height: 100%;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="./index.css" />
 </head>
 
 <body>
@@ -445,10 +59,11 @@
 
     <div id="demos-section" class="demos-section">
         <h2 class="blog-posts-header">Demo</h2>
-        <p>推荐</p>
+        <p style="color: #888;text-align: center;">为了更好的浏览体验，请尽量在WEB端打开演示页面</p>
+        <p style="color: #888;text-align: center;">鼠标交互方式：左键平移，右键旋转，滚轮缩放</p>
         <div class="demo">
             <div class="demo-image">
-                <img src="./images/i3.jpg" alt="Demo Image">
+                <img src="./demo/img/i3.jpg" alt="Demo Image">
                 <!-- <img src="https://picsum.photos/800/400?random=6" alt="Demo Image"> -->
             </div>
             <div class="demo-content">
@@ -456,10 +71,11 @@
                 <div class="demo-description">
                     &emsp;&emsp;这个演示程序中包含两个场景：全景图和模型视图。
                     全景图只能进行旋转，而模型视图可以进行旋转、平移和缩放。
-                    当按下“关联”按钮后，这两个场景就会相互连接起来。
-                    此时，模型视图也只能旋转，旋转一个场景会使另一个场景跟随旋转且旋转角度相同。
+                    点击页面中心按钮，指示灯亮起时，这两个场景就会相互连接起来，即视角同步。
+                    此时，旋转一个场景会使另一个场景跟随旋转且旋转角度相同；再次点击，指示灯灭，取消联动。
+
                 </div>
-                <a href="./panorama.html" class="demo-link">查看详情</a>
+                <a href="./demo/panorama.html" class="demo-link">查看详情</a>
             </div>
         </div>
         <div class="demo">
@@ -469,14 +85,16 @@
             <div class="demo-content">
                 <h3 class="demo-title">模型材质替换</h3>
                 <div class="demo-description">
-                    &emsp;&emsp;这是一个可以替换模型材质的演示程序。请先单击选中组件，然后再单击左侧的面料图片。同一个构件更换材质无需重复选择模型，只需通过点击左侧的图片即可完成切换。
+                    &emsp;&emsp;这是一个可以替换模型材质的演示程序。请先单击选中组件，然后再单击左侧的面料图片。
+                    同一个构件更换材质无需重复选择模型，只需通过点击左侧的图片即可完成切换。
+                    点击空白区域后需要重新选择模型，才可继续点击左侧图片替换材质。
                 </div>
-                <a href="./changeTexture.html" class="demo-link">查看详情</a>
+                <a href="./demo/changeTexture.html" class="demo-link">查看详情</a>
             </div>
         </div>
         <div class="demo">
             <div class="demo-image">
-                <img src="./images/house.png" alt="Demo Image">
+                <img src="./images/light.png" alt="Demo Image">
             </div>
             <div class="demo-content">
                 <h3 class="demo-title">光照、阴影、HSLC调节</h3>
@@ -486,40 +104,46 @@
                     另外还可以对HSLC（即色调、饱和度、亮度和对比度）以及投影的颜色、高度、透明度和虚化度等进行调节。
 
                 </div>
-                <a href="./lightControl.html" class="demo-link">查看详情</a>
+                <a href="./demo/lightControl.html" class="demo-link">查看详情</a>
             </div>
         </div>
     </div>
 
-    <div id="blog-posts-section" class="blog-posts-section" onclick="window.location.href='./blog.html';">
+    <div id="blog-posts-section" class="blog-posts-section">
         <h2 class="blog-posts-header">最新博客文章</h2>
-        <div class="blog-post">
+        <div class="blog-post" onclick="window.location.href='./building.html';">
             <div class="blog-post-image">
                 <img src="https://picsum.photos/800/400?random=4" alt="Blog Post Image">
             </div>
             <div class="blog-post-content">
-                <h3 class="blog-post-title"><a href="#">「GLTFPACK」工具在优化3D模型中的应用与研究</a></h3>
-                <div class="blog-post-date">发布时间：2021年10月1日</div>
+                <h3 class="blog-post-title"><a href="#">gltfpack工具在优化3D模型中的应用与研究</a></h3>
+                <div class="blog-post-date">发布时间：2022年4月28日</div>
                 <div class="blog-post-excerpt">
-                    GLTFPACK是一个命令行工具，可将多个glTF格式的3D模型文件压缩成一个单独的glTF文件，并使用多种技术来减少面数。
-                    其减面原理包括三角形丢弃、顶点合并、翻转三角形和利用LOD。
-                    使用GLTFPACK 可以显著减少 3D模型的面数，提高性能，是一种非常不错和有效的性能提升方式。
+                    &emsp;&emsp;对于大型场景文件，大量的资源可能会导致性能问题。
+                    gltfpack可以对GLTF文件进行优化压缩，从而提高Web应用程序的性能。
+                    本文将介绍如何使用gltfpack来优化GLTF文件，以及一些注意事项。
+
                 </div>
             </div>
         </div>
-        <div class="blog-post">
+        <div class="blog-post" onclick="window.location.href='./building.html';">
             <div class="blog-post-image">
                 <img src="https://picsum.photos/800/400?random=5" alt="Blog Post Image">
             </div>
             <div class="blog-post-content">
-                <h3 class="blog-post-title"><a href="#">文章标题2</a></h3>
-                <div class="blog-post-date">发布时间：2021年9月15日</div>
+                <h3 class="blog-post-title"><a href="#">如何使用Web Worker优化Three.js应用程序</a></h3>
+                <div class="blog-post-date">发布时间：2022年9月15日</div>
                 <div class="blog-post-excerpt">
-                    这里是文章内容的摘要，可以简要概括一下主要内容和观点。
+                    &emsp;&emsp;前端开发中使用Three.js的场景越来越多，Three.js是一个强大的Web3D引擎，但是在渲染复杂场景时，我们可能会遇到一些性能瓶颈。
+                    Web Worker可以在后台使用多线程处理繁重的计算任务，减轻主线程的压力从而优化应用程序性能。
+                    本文将介绍如何使用Web Worker来解决Three.js应用程序的性能问题。
+
                 </div>
             </div>
         </div>
     </div>
+
+
     <!-- <div id="contact-section" class="contact-section">
         <h2>联系方式</h2>
         <div>
@@ -531,8 +155,10 @@
 
 
     <div id="contact-section" class="contact-info">
-        <h2>Get in touch联系方式</h2>
-        <p>如果您正在寻找一个3D可视化方面的前端开发者，请考虑联系我，我期待着与您一起探索创新和实现卓越的设计。</p>
+        <h2>Get in touch</h2>
+        <p style="line-height:2;">如果您正在寻找一个3D可视化方面的前端开发者，<br>
+            可以点击下方图标与我联系，<br>
+            我期待着与您一起探索创新和实现卓越的设计。</p>
         <ul>
             <li><a href="tel:18017020050"><i class="icon"> <img src="images/phone.png" alt="icon" /></i></a></li>
             <li><a href="mailto:1299860310@qq.com"><i class="icon"><img src="images/mail.png" alt="icon" /></i></a></li>
@@ -546,7 +172,7 @@
 
 <script>
     var slideIndex = 0;
-    showSlides();
+    // showSlides();
 
     function showSlides() {
         var i;
