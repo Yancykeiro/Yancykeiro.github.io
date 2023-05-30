@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>three.js css3d - periodic table</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            background-color: #000;
+            color: #fff;
+            font-family: Monospace;
+            font-size: 13px;
+            line-height: 24px;
+            overscroll-behavior: none;
+        }
+
+        a {
+            color: #ff0;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        button {
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        #info {
+            position: absolute;
+            top: 0px;
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            text-align: center;
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            pointer-events: none;
+            z-index: 1;
+            /* TODO Solve this in HTML */
+        }
+
+        a,
+        button,
+        input,
+        select {
+            pointer-events: auto;
+        }
+
+        .lil-gui {
+            z-index: 2 !important;
+            /* TODO Solve this in HTML */
+        }
+
+        @media all and (max-width: 640px) {
+            .lil-gui.root {
+                right: auto;
+                top: auto;
+                max-height: 50%;
+                max-width: 80%;
+                bottom: 0;
+                left: 0;
+            }
+        }
+
+        #overlay {
+            position: absolute;
+            font-size: 16px;
+            z-index: 2;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        #overlay button {
+            background: transparent;
+            border: 0;
+            border: 1px solid rgb(255, 255, 255);
+            border-radius: 4px;
+            color: #ffffff;
+            padding: 12px 18px;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        #notSupported {
+            width: 50%;
+            margin: auto;
+            background-color: #f00;
+            margin-top: 20px;
+            padding: 10px;
+        }
+
+
+        a {
+            color: #8ff;
+        }
+
+        #menu {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .element {
+            width: 120px;
+            height: 160px;
+            box-shadow: 0px 0px 12px rgba(0, 255, 255, 0.5);
+            border: 1px solid rgba(127, 255, 255, 0.25);
+            font-family: Helvetica, sans-serif;
+            text-align: center;
+            line-height: normal;
+            cursor: default;
+        }
+
+        .element:hover {
+            box-shadow: 0px 0px 12px rgba(0, 255, 255, 0.75);
+            border: 1px solid rgba(127, 255, 255, 0.75);
+        }
+
+        .element .number {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 12px;
+            color: rgba(127, 255, 255, 0.75);
+        }
+
+        .element .symbol {
+            position: absolute;
+            top: 40px;
+            left: 0px;
+            right: 0px;
+            font-size: 60px;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.75);
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.95);
+        }
+
+        .element .details {
+            position: absolute;
+            bottom: 15px;
+            left: 0px;
+            right: 0px;
+            font-size: 12px;
+            color: rgba(127, 255, 255, 0.75);
+        }
+
+        button {
+            color: rgba(127, 255, 255, 0.75);
+            background: transparent;
+            outline: 1px solid rgba(127, 255, 255, 0.75);
+            border: 0px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: rgba(0, 255, 255, 0.5);
+        }
+
+        button:active {
+            color: #000000;
+            background-color: rgba(0, 255, 255, 0.75);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container"></div>
+    <div id="menu">
+        <button id="table">TABLE</button>
+        <button id="sphere">SPHERE</button>
+        <button id="helix">HELIX</button>
+        <button id="grid">GRID</button>
+    </div>
+
+    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+    <script src="https://unpkg.com/three@0.132.1/build/three.js"></script>
+
+    <script type="module">
+
+        // import * as THREE from 'three';
+
+        import { TWEEN } from './demo/lib/tween.module.min.js';
+        import { TrackballControls } from './demo/lib/TrackballControls.js';
+        import { CSS3DRenderer, CSS3DObject } from './demo/lib/CSS3DRenderer.js';
+
+        const table = [
+            'A', 'About', '关于', 1, 1,
+            'B', 'Blog', '博客', 10, 1,
+            'C', 'Contact', '联系方式', 1, 2,
+            'D', 'Demo', '演示', 2, 2,
+            'E', 'Education', '教育经历', 6, 2,
+            'F', 'Feedback', '反馈', 7, 2,
+            'G', 'Gallery', '图库', 8, 2,
+            'H', 'Homepage', '主页', 9, 2,
+            'I', 'Interests', '兴趣', 10, 2,
+            'J', 'journal', '期刊', 1, 3,
+            'K', 'Keyword', '关键词', 2, 3,
+            'L', 'Links', '链接', 3, 3,
+            'M', 'Media', '媒体', 4, 3,
+            'N', 'News', '新闻', 5, 3,
+            'O', 'Opinions', '意见', 6, 3,
+            'P', 'Photos', '照片', 7, 3,
+            'Q', 'Questions ', '常见问题解答', 8, 3,
+            'R', 'Resume', '简历', 9, 3,
+            'S', 'Skill', '技术栈', 10, 3,
+            'T', 'Tips', '技巧', 1, 4,
+            'U', 'User Guide ', '用户指南', 2, 4,
+            'V', 'Videos', '视频', 3, 4,
+            'W', 'Weather', '天气', 4, 4,
+            'X', 'Xmind', '思维导图', 5, 4,
+            'Y', 'Yancy', '杨思', 6, 4,
+            'Z', 'Zeal', '热情', 7, 4,
+            // 'A', 'About', '关于', 9, 4,
+            // 'B', 'Blog', '博客', 10, 4,
+            // 'C', 'Contact', '联系方式', 11, 4,
+            // 'D', 'Demo', '演示', 12, 4,
+            // 'E', 'Education', '教育经历', 13, 24,
+            // 'F', 'Feedback', '反馈', 14, 4,
+            // 'G', 'Gallery', '图库', 15, 4,
+            // 'H', 'Homepage', '主页', 16, 4,
+            // 'I', 'Interests', '兴趣', 17, 4,
+            // 'J', 'journal', '期刊', 18, 4,
+
+
+            // 'K', 'Keyword', '关键词', 1, 5,
+            // 'L', 'Links', '链接', 2, 5,
+            // 'M', 'Media', '媒体', 3, 5,
+            // 'N', 'News', '新闻', 4, 5,
+            // 'O', 'Opinions', '意见', 5, 5,
+            // 'P', 'Photos', '照片', 6, 5,
+            // 'Q', 'Questions ', '常见问题解答', 7, 5,
+            // 'R', 'Resume', '简历', 8, 5,
+            // 'S', 'Skill', '技术栈', 9, 5,
+            // 'T', 'Tips', '技巧', 10, 5,
+            // 'U', 'User Guide ', '用户指南', 11, 5,
+            // 'V', 'Videos', '视频', 12, 5,
+            // 'W', 'Weather', '天气', 13, 5,
+            // 'X', 'Xmind', '思维导图', 14, 5,
+            // 'Y', 'Yancy', '杨思', 15, 5,
+            // 'Z', 'Zeal', '热情', 16, 5,
+
+            // 'Rb', 'Rubidium', '85.4678', 1, 5,
+            // 'Sr', 'Strontium', '87.62', 2, 5,
+            // 'Y', 'Yttrium', '88.90585', 3, 5,
+            // 'Zr', 'Zirconium', '91.224', 4, 5,
+            // 'Nb', 'Niobium', '92.90628', 5, 5,
+            // 'Mo', 'Molybdenum', '95.96', 6, 5,
+            // 'Tc', 'Technetium', '(98)', 7, 5,
+            // 'Ru', 'Ruthenium', '101.07', 8, 5,
+            // 'Rh', 'Rhodium', '102.9055', 9, 5,
+            // 'Pd', 'Palladium', '106.42', 10, 5,
+            // 'Ag', 'Silver', '107.8682', 11, 5,
+            // 'Cd', 'Cadmium', '112.411', 12, 5,
+            // 'In', 'Indium', '114.818', 13, 5,
+            // 'Sn', 'Tin', '118.71', 14, 5,
+            // 'Sb', 'Antimony', '121.76', 15, 5,
+            // 'Te', 'Tellurium', '127.6', 16, 5,
+            // 'I', 'Iodine', '126.90447', 17, 5,
+            // 'Xe', 'Xenon', '131.293', 18, 5,
+
+
+            // 'Cs', 'Caesium', '132.9054', 1, 6,
+            // 'Ba', 'Barium', '132.9054', 2, 6,
+            // 'La', 'Lanthanum', '138.90547', 4, 9,
+            // 'Ce', 'Cerium', '140.116', 5, 9,
+            // 'Pr', 'Praseodymium', '140.90765', 6, 9,
+            // 'Nd', 'Neodymium', '144.242', 7, 9,
+            // 'Pm', 'Promethium', '(145)', 8, 9,
+            // 'Sm', 'Samarium', '150.36', 9, 9,
+            // 'Eu', 'Europium', '151.964', 10, 9,
+            // 'Gd', 'Gadolinium', '157.25', 11, 9,
+            // 'Tb', 'Terbium', '158.92535', 12, 9,
+            // 'Dy', 'Dysprosium', '162.5', 13, 9,
+            // 'Ho', 'Holmium', '164.93032', 14, 9,
+            // 'Er', 'Erbium', '167.259', 15, 9,
+            // 'Tm', 'Thulium', '168.93421', 16, 9,
+            // 'Yb', 'Ytterbium', '173.054', 17, 9,
+            // 'Lu', 'Lutetium', '174.9668', 18, 9,
+            // 'Hf', 'Hafnium', '178.49', 4, 6,
+            // 'Ta', 'Tantalum', '180.94788', 5, 6,
+            // 'W', 'Tungsten', '183.84', 6, 6,
+            // 'Re', 'Rhenium', '186.207', 7, 6,
+            // 'Os', 'Osmium', '190.23', 8, 6,
+            // 'Ir', 'Iridium', '192.217', 9, 6,
+            // 'Pt', 'Platinum', '195.084', 10, 6,
+            // 'Au', 'Gold', '196.966569', 11, 6,
+            // 'Hg', 'Mercury', '200.59', 12, 6,
+            // 'Tl', 'Thallium', '204.3833', 13, 6,
+            // 'Pb', 'Lead', '207.2', 14, 6,
+            // 'Bi', 'Bismuth', '208.9804', 15, 6,
+            // 'Po', 'Polonium', '(209)', 16, 6,
+            // 'At', 'Astatine', '(210)', 17, 6,
+            // 'Rn', 'Radon', '(222)', 18, 6,
+            // 'Fr', 'Francium', '(223)', 1, 7,
+            // 'Ra', 'Radium', '(226)', 2, 7,
+            // 'Ac', 'Actinium', '(227)', 4, 10,
+            // 'Th', 'Thorium', '232.03806', 5, 10,
+            // 'Pa', 'Protactinium', '231.0588', 6, 10,
+            // 'U', 'Uranium', '238.02891', 7, 10,
+            // 'Np', 'Neptunium', '(237)', 8, 10,
+            // 'Pu', 'Plutonium', '(244)', 9, 10,
+            // 'Am', 'Americium', '(243)', 10, 10,
+            // 'Cm', 'Curium', '(247)', 11, 10,
+            // 'Bk', 'Berkelium', '(247)', 12, 10,
+            // 'Cf', 'Californium', '(251)', 13, 10,
+            // 'Es', 'Einstenium', '(252)', 14, 10,
+            // 'Fm', 'Fermium', '(257)', 15, 10,
+            // 'Md', 'Mendelevium', '(258)', 16, 10,
+            // 'No', 'Nobelium', '(259)', 17, 10,
+            // 'Lr', 'Lawrencium', '(262)', 18, 10,
+            // 'Rf', 'Rutherfordium', '(267)', 4, 7,
+            // 'Db', 'Dubnium', '(268)', 5, 7,
+            // 'Sg', 'Seaborgium', '(271)', 6, 7,
+            // 'Bh', 'Bohrium', '(272)', 7, 7,
+            // 'Hs', 'Hassium', '(270)', 8, 7,
+            // 'Mt', 'Meitnerium', '(276)', 9, 7,
+            // 'Ds', 'Darmstadium', '(281)', 10, 7,
+            // 'Rg', 'Roentgenium', '(280)', 11, 7,
+            // 'Cn', 'Copernicium', '(285)', 12, 7,
+            // 'Nh', 'Nihonium', '(286)', 13, 7,
+            // 'Fl', 'Flerovium', '(289)', 14, 7,
+            // 'Mc', 'Moscovium', '(290)', 15, 7,
+            // 'Lv', 'Livermorium', '(293)', 16, 7,
+            // 'Ts', 'Tennessine', '(294)', 17, 7,
+            // 'Og', 'Oganesson', '(294)', 18, 7
+        ];
+
+        let camera, scene, renderer;
+        let controls;
+
+        const objects = [];
+        const targets = { table: [], sphere: [], helix: [], grid: [] };
+
+        init();
+        animate();
+
+        function init() {
+
+            camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 10000);
+            camera.position.z = 3000;
+
+            scene = new THREE.Scene();
+
+            // table
+
+            for (let i = 0; i < table.length; i += 5) {
+
+                const element = document.createElement('div');
+                element.className = 'element';
+                element.style.backgroundColor = 'rgba(0,127,127,' + (Math.random() * 0.5 + 0.25) + ')';
+
+                const number = document.createElement('div');
+                number.className = 'number';
+                number.textContent = (i / 5) + 1;
+                element.appendChild(number);
+
+                const symbol = document.createElement('div');
+                symbol.className = 'symbol';
+                symbol.textContent = table[i];
+                element.appendChild(symbol);
+
+                const details = document.createElement('div');
+                details.className = 'details';
+                details.innerHTML = table[i + 1] + '<br>' + table[i + 2];
+                element.appendChild(details);
+
+                const objectCSS = new CSS3DObject(element);
+                objectCSS.position.x = Math.random() * 4000 - 2000;
+                objectCSS.position.y = Math.random() * 4000 - 2000;
+                objectCSS.position.z = Math.random() * 4000 - 2000;
+                scene.add(objectCSS);
+
+                objects.push(objectCSS);
+
+                //
+
+                const object = new THREE.Object3D();
+                object.position.x = (table[i + 3] * 140) - 800;
+                object.position.y = - (table[i + 4] * 180) + 660;
+
+                targets.table.push(object);
+
+            }
+
+            // sphere
+
+            const vector = new THREE.Vector3();
+
+            for (let i = 0, l = objects.length; i < l; i++) {
+
+                const phi = Math.acos(- 1 + (2 * i) / l);
+                const theta = Math.sqrt(l * Math.PI) * phi;
+
+                const object = new THREE.Object3D();
+
+                object.position.setFromSphericalCoords(500, phi, theta);
+
+                vector.copy(object.position).multiplyScalar(2);
+
+                object.lookAt(vector);
+
+                targets.sphere.push(object);
+
+            }
+
+            // helix
+
+            for (let i = 0, l = objects.length; i < l; i++) {
+
+                const theta = i * 0.5 + Math.PI;
+                const y = - (i * 20) + 680;
+
+                const object = new THREE.Object3D();
+
+                object.position.setFromCylindricalCoords(400, theta, y);
+
+                vector.x = object.position.x * 2;
+                vector.y = object.position.y;
+                vector.z = object.position.z * 2;
+
+                object.lookAt(vector);
+
+                targets.helix.push(object);
+
+            }
+
+            // grid
+
+            for (let i = 0; i < objects.length; i++) {
+
+                const object = new THREE.Object3D();
+
+                object.position.x = ((i % 4) * 400) - 800;
+                object.position.y = (- (Math.floor(i / 4) % 4) * 400) + 800;
+                object.position.z = (Math.floor(i / 16)) * 1000 - 2000;
+
+                targets.grid.push(object);
+
+            }
+
+            //
+
+            renderer = new CSS3DRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('container').appendChild(renderer.domElement);
+
+            //
+            transform(targets.table, 2000);
+
+            const params = [targets.table, targets.sphere, targets.helix, targets.grid];
+            let index = 0;
+
+            const timerId = setInterval(function () {
+                transform(params[index], 2000);
+                index = (index + 1) % params.length;
+            }, 4000);
+
+
+            controls = new TrackballControls(camera, renderer.domElement);
+            controls.minDistance = 500;
+            controls.maxDistance = 6000;
+            controls.addEventListener('change', render);
+
+            const buttonTable = document.getElementById('table');
+            buttonTable.addEventListener('click', function () {
+                clearTimeout(timerId);
+                transform(targets.table, 2000);
+
+            });
+
+            const buttonSphere = document.getElementById('sphere');
+            buttonSphere.addEventListener('click', function () {
+                clearTimeout(timerId);
+                transform(targets.sphere, 2000);
+
+            });
+
+            const buttonHelix = document.getElementById('helix');
+            buttonHelix.addEventListener('click', function () {
+                clearTimeout(timerId);
+                transform(targets.helix, 2000);
+
+            });
+
+            const buttonGrid = document.getElementById('grid');
+            buttonGrid.addEventListener('click', function () {
+                clearTimeout(timerId);
+
+                transform(targets.grid, 2000);
+
+            });
+
+
+
+            //
+
+            window.addEventListener('resize', onWindowResize);
+
+        }
+
+        function transform(targets, duration) {
+
+            TWEEN.removeAll();
+
+            for (let i = 0; i < objects.length; i++) {
+
+                const object = objects[i];
+                const target = targets[i];
+
+                new TWEEN.Tween(object.position)
+                    .to({ x: target.position.x, y: target.position.y, z: target.position.z }, Math.random() * duration + duration)
+                    .easing(TWEEN.Easing.Exponential.InOut)
+                    .start();
+
+                new TWEEN.Tween(object.rotation)
+                    .to({ x: target.rotation.x, y: target.rotation.y, z: target.rotation.z }, Math.random() * duration + duration)
+                    .easing(TWEEN.Easing.Exponential.InOut)
+                    .start();
+
+            }
+
+            new TWEEN.Tween(this)
+                .to({}, duration * 2)
+                .onUpdate(render)
+                .start();
+
+        }
+
+
+
+
+
+
+
+        function onWindowResize() {
+
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            render();
+
+        }
+
+        function animate() {
+
+            requestAnimationFrame(animate);
+
+            TWEEN.update();
+
+            controls.update();
+
+        }
+
+        function render() {
+
+            renderer.render(scene, camera);
+
+        }
+
+    </script>
+</body>
+
+</html>
