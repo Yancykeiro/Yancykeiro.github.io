@@ -342,11 +342,45 @@
             // 'Og', 'Oganesson', '(294)', 18, 7
         ];
 
+
+        const urls = {
+            A: "./building.html",
+            B: "./building.html",
+            C: "./building.html",
+            D: "./building.html",
+            E: "./building.html",
+            F: "./building.html",
+            G: "./building.html",
+            H: "./index.html",
+            I: "./building.html",
+            J: "./building.html",
+            K: "./building.html",
+            L: "./building.html",
+            M: "./building.html",
+            N: "./building.html",
+            O: "./building.html",
+            P: "./building.html",
+            Q: "./building.html",
+            R: "./building.html",
+            S: "./building.html",
+            T: "./building.html",
+            U: "./building.html",
+            V: "./building.html",
+            W: "./building.html",
+            X: "./building.html",
+            Y: "./building.html",
+            Z: "./building.html",
+        }
+
+
+
+
         let camera, scene, renderer;
         let controls;
 
         const objects = [];
         const targets = { table: [], sphere: [], helix: [], grid: [] };
+        const _box = new THREE.Box3();
 
         init();
         animate();
@@ -356,7 +390,7 @@
             camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 10000);
             camera.position.z = 3000;
 
-            scene = new THREE.Scene();
+            scene = window.scene = new THREE.Scene();
 
             // table
 
@@ -382,12 +416,24 @@
                 element.appendChild(details);
 
                 const objectCSS = new CSS3DObject(element);
+                objectCSS.name = table[i];
+                objectCSS.userData = { url: './index.html' };
+
                 objectCSS.position.x = Math.random() * 4000 - 2000;
                 objectCSS.position.y = Math.random() * 4000 - 2000;
                 objectCSS.position.z = Math.random() * 4000 - 2000;
                 scene.add(objectCSS);
 
                 objects.push(objectCSS);
+
+                // objectCSS.element.addEventListener("mouseenter", () => {
+                //     console.log("yss", objectCSS.name, objectCSS.element)
+                // })
+                objectCSS.element.onpointerdown = (event) => {
+                    window.location.href = urls[objectCSS.name];
+
+                };
+
 
                 //
 
@@ -464,7 +510,7 @@
             //
             transform(targets.table, 2000);
 
-            const params = [targets.table, targets.sphere, targets.helix, targets.grid];
+            const params = [targets.sphere, targets.helix, targets.grid, targets.table];
             let index = 0;
 
             const timerId = setInterval(function () {
@@ -493,6 +539,7 @@
             });
 
             const buttonHelix = document.getElementById('helix');
+            console.log("h", buttonHelix)
             buttonHelix.addEventListener('click', function () {
                 clearTimeout(timerId);
                 transform(targets.helix, 2000);
@@ -513,7 +560,13 @@
 
             window.addEventListener('resize', onWindowResize);
 
+
+
         }
+
+
+
+
 
         function transform(targets, duration) {
 
@@ -571,8 +624,8 @@
         }
 
         function render() {
-
             renderer.render(scene, camera);
+
 
         }
 
